@@ -1,0 +1,13 @@
+timestamp,signal,value,unit
+0.00,k1_clutch_pressure_candidate,36.5,bar
+0.00,k2_clutch_pressure_candidate,34.5,bar
+0.00,gearbox_oil_pressure_or_temp_candidate,88,raw
+0.35,k1_clutch_pressure_candidate,40.5,bar
+0.35,k2_clutch_pressure_candidate,38.6,bar
+0.35,gearbox_oil_pressure_or_temp_candidate,91,raw
+0.70,k1_clutch_pressure_candidate,47.8,bar
+0.70,k2_clutch_pressure_candidate,43.2,bar
+0.70,gearbox_oil_pressure_or_temp_candidate,94,raw
+1.05,k1_clutch_pressure_candidate,53.4,bar
+1.05,k2_clutch_pressure_candidate,48.8,bar
+1.05,gearbox_oil_pressure_or_temp_candidate,96,raw

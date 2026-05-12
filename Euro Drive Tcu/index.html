@@ -1,0 +1,2351 @@
+﻿<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EDS/TCU Lab</title>
+  <style>
+    :root {
+      --ink: #f3f6f8;
+      --muted: #aab4bd;
+      --line: #2b333d;
+      --panel: #11171d;
+      --paper: #0d1117;
+      --red: #e30613;
+      --red-soft: #ffe4e7;
+      --green: #23845f;
+      --green-soft: #dff5ec;
+      --blue: #4a6578;
+      --blue-soft: #e6edf1;
+      --amber: #b56a10;
+      --amber-soft: #fff0d8;
+      --titanium: #c8ccd0;
+      --carbon: #080a0d;
+      --shadow: 0 18px 42px rgba(0, 0, 0, 0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 18% 8%, rgba(227, 6, 19, 0.18), transparent 28%),
+        radial-gradient(circle at 78% 0%, rgba(200, 204, 208, 0.13), transparent 24%),
+        linear-gradient(145deg, #05070a 0%, #10151b 43%, #20272e 100%);
+      font-family: "Audi Type Extended", "Formula1 Display", "Arial Narrow", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+      line-height: 1.45;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    .shell {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 280px 1fr;
+    }
+
+    .sidebar {
+      background:
+        linear-gradient(155deg, rgba(227, 6, 19, 0.2), transparent 33%),
+        linear-gradient(180deg, #080a0d 0%, #17191c 100%);
+      color: #f6f8fb;
+      padding: 24px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+    }
+
+    .mark {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      background:
+        linear-gradient(135deg, var(--red) 0 48%, #f7f8f9 48% 58%, #17191c 58%);
+      font-weight: 800;
+      letter-spacing: 0;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 17px;
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+
+    .brand span {
+      display: block;
+      color: #aeb9c6;
+      font-size: 12px;
+      margin-top: 2px;
+    }
+
+    .nav {
+      display: grid;
+      gap: 6px;
+    }
+
+    .nav button {
+      color: #d9e0e8;
+      background: transparent;
+      border-radius: 8px;
+      padding: 11px 12px;
+      text-align: left;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .nav button.active,
+    .nav button:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.11);
+    }
+
+    .status-box {
+      margin-top: auto;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 8px;
+      padding: 14px;
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .status-box strong {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+
+    .status-box p {
+      color: #b8c3ce;
+      margin: 0;
+      font-size: 12px;
+    }
+
+    main {
+      padding: 22px;
+      display: grid;
+      gap: 18px;
+      align-content: start;
+    }
+
+    .page {
+      display: none;
+      gap: 18px;
+      align-content: start;
+    }
+
+    .page.active {
+      display: grid;
+    }
+
+    .topbar,
+    .module,
+    .card {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .topbar {
+      min-height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 16px 18px;
+    }
+
+    .topbar h2 {
+      margin: 0;
+      font-size: 20px;
+      letter-spacing: 0;
+    }
+
+    .topbar p {
+      margin: 3px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 9px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .btn {
+      min-height: 38px;
+      border-radius: 8px;
+      padding: 0 13px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--ink);
+      background: #171f27;
+      border: 1px solid var(--line);
+      white-space: nowrap;
+    }
+
+    .btn.primary {
+      background: var(--red);
+      color: #fff;
+      border-color: var(--red);
+    }
+
+    .btn.locked {
+      background: #1b222a;
+      color: #8a94a3;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 2.05fr) minmax(250px, 0.58fr);
+      gap: 18px;
+    }
+
+    .module {
+      padding: 18px;
+    }
+
+    .module-head {
+      display: flex;
+      align-items: start;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .module h3 {
+      margin: 0;
+      font-size: 16px;
+      letter-spacing: 0;
+    }
+
+    .module .hint {
+      color: var(--muted);
+      font-size: 12px;
+      margin: 3px 0 0;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .pill.green {
+      color: var(--green);
+      background: var(--green-soft);
+    }
+
+    .pill.amber {
+      color: var(--amber);
+      background: var(--amber-soft);
+    }
+
+    .pill.blue {
+      color: var(--blue);
+      background: var(--blue-soft);
+    }
+
+    .pill.red {
+      color: var(--red);
+      background: var(--red-soft);
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .card {
+      padding: 14px;
+      box-shadow: none;
+      transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+    }
+
+    .card.hot-abuse {
+      border-color: rgba(227, 6, 19, 0.78);
+      box-shadow: 0 0 0 1px rgba(227, 6, 19, 0.42), 0 0 30px rgba(227, 6, 19, 0.55);
+      background: linear-gradient(145deg, rgba(227, 6, 19, 0.16), #10161d 58%);
+    }
+
+    .metric {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 6px;
+    }
+
+    .value {
+      font-size: 25px;
+      font-weight: 780;
+      letter-spacing: 0;
+    }
+
+    .value small {
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 650;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      border-radius: 8px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .menu-field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .menu-field label {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 760;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .menu-field select,
+    .menu-field input {
+      width: 100%;
+      min-height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 0 10px;
+      background: #10161d;
+      color: var(--ink);
+    }
+
+    .segmented {
+      display: inline-grid;
+      grid-auto-flow: column;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      background: var(--paper);
+    }
+
+    .segmented button {
+      min-width: 72px;
+      padding: 8px 11px;
+      background: transparent;
+      border-right: 1px solid var(--line);
+      color: var(--muted);
+    }
+
+    .segmented button:last-child {
+      border-right: 0;
+    }
+
+    .segmented button.active {
+      color: #fff;
+      background: var(--blue);
+    }
+
+    .controls {
+      display: grid;
+      gap: 13px;
+    }
+
+    .calibration-menu {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 16px;
+      background: #10161d;
+    }
+
+    .calibration-tabs {
+      display: grid;
+      align-content: start;
+      background: #101317;
+      padding: 8px;
+      gap: 5px;
+    }
+
+    .calibration-tabs button {
+      min-height: 39px;
+      border-radius: 7px;
+      text-align: left;
+      padding: 0 11px;
+      color: #c7cdd4;
+      background: transparent;
+    }
+
+    .calibration-tabs button.active {
+      color: #fff;
+      background: var(--red);
+    }
+
+    .calibration-detail {
+      padding: 14px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      align-content: start;
+    }
+
+    .deep-card {
+      border: 1px solid #e2e6ea;
+      border-radius: 8px;
+      padding: 11px;
+      background: #111820;
+    }
+
+    .deep-card strong {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 3px;
+    }
+
+    .deep-card span {
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .control {
+      display: grid;
+      grid-template-columns: minmax(170px, 0.8fr) 1fr 72px;
+      gap: 12px;
+      align-items: center;
+      border-bottom: 1px solid #242c35;
+      padding-bottom: 13px;
+    }
+
+    .control:last-child {
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .control label {
+      font-weight: 730;
+      font-size: 13px;
+    }
+
+    .control span {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 500;
+      margin-top: 3px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--red);
+    }
+
+    .number {
+      height: 36px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      padding: 0 8px;
+      text-align: right;
+      background: #10161d;
+    }
+
+    .heatmap {
+      display: grid;
+      grid-template-columns: 56px repeat(7, 1fr);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .cell {
+      min-height: 42px;
+      padding: 7px;
+      border-right: 1px solid #252e38;
+      border-bottom: 1px solid #252e38;
+      display: grid;
+      place-items: center;
+      font-size: 12px;
+      font-weight: 720;
+      background: #10161d;
+    }
+
+    .cell.head {
+      background: #171f27;
+      color: var(--muted);
+      font-weight: 760;
+    }
+
+    .cell:last-child,
+    .cell:nth-child(8n) {
+      border-right: 0;
+    }
+
+    .cell:nth-last-child(-n + 8) {
+      border-bottom: 0;
+    }
+
+    .map-low {
+      background: #163429;
+    }
+
+    .map-mid {
+      background: #3a2a12;
+    }
+
+    .map-high {
+      background: #40191b;
+    }
+
+    .stack {
+      display: grid;
+      gap: 18px;
+    }
+
+    .grid > aside.stack {
+      gap: 12px;
+      align-self: start;
+    }
+
+    .grid > aside.stack .module {
+      padding: 12px;
+      box-shadow: none;
+    }
+
+    .grid > aside.stack .module-head {
+      margin-bottom: 9px;
+    }
+
+    .grid > aside.stack .module h3 {
+      font-size: 14px;
+    }
+
+    .grid > aside.stack .hint {
+      display: none;
+    }
+
+    .grid > aside.stack .gauge {
+      max-height: 132px;
+      aspect-ratio: 2.35 / 1;
+    }
+
+    .grid > aside.stack .gauge-center {
+      font-size: 22px;
+      inset: auto 0 9px;
+    }
+
+    .grid > aside.stack .gauge-center small {
+      font-size: 10px;
+    }
+
+    .grid > aside.stack .event {
+      grid-template-columns: 50px 1fr auto;
+      gap: 7px;
+      padding: 7px 0;
+      font-size: 12px;
+    }
+
+    .grid > aside.stack .event time,
+    .grid > aside.stack .pill {
+      font-size: 10px;
+    }
+
+    .grid > aside.stack .file-item {
+      padding: 6px 0;
+      font-size: 12px;
+    }
+    .gauge {
+      aspect-ratio: 1.8 / 1;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background:
+        radial-gradient(circle at 50% 96%, #0d1117 0 33%, transparent 34%),
+        conic-gradient(from 255deg at 50% 95%, var(--green) 0deg, #7fb25d 72deg, var(--amber) 118deg, var(--red) 170deg, #e9edf2 171deg 360deg);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .needle {
+      width: 42%;
+      height: 4px;
+      background: #121820;
+      border-radius: 999px;
+      position: absolute;
+      left: 50%;
+      bottom: 9%;
+      transform-origin: left center;
+      transform: rotate(-28deg);
+      transition: transform 220ms ease;
+    }
+
+    .gauge-center {
+      position: absolute;
+      inset: auto 0 13px;
+      text-align: center;
+      font-weight: 800;
+      font-size: 29px;
+    }
+
+    .gauge-center small {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 650;
+    }
+
+    #events {
+      max-height: 132px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .grid > aside.stack .file-list {
+      max-height: 126px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .gauge.hot-health {
+      border-color: rgba(227, 6, 19, 0.82);
+      box-shadow: 0 0 0 1px rgba(227, 6, 19, 0.42), 0 0 34px rgba(227, 6, 19, 0.5);
+      background:
+        radial-gradient(circle at 50% 96%, #16090a 0 33%, transparent 34%),
+        conic-gradient(from 255deg at 50% 95%, #7a1417 0deg, var(--red) 118deg, #ff5661 170deg, #2a1113 171deg 360deg);
+    }
+
+    .gauge.hot-health .gauge-center {
+      color: #fff;
+      text-shadow: 0 0 16px rgba(227, 6, 19, 0.95);
+    }
+    .timeline {
+      display: grid;
+      gap: 10px;
+    }
+
+    .event {
+      display: grid;
+      grid-template-columns: 84px 1fr auto;
+      gap: 10px;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #242c35;
+      font-size: 13px;
+    }
+
+    .event:last-child {
+      border-bottom: 0;
+    }
+
+    .event time {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .comparison {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .compare-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 13px;
+      background: #10161d;
+    }
+
+    .compare-card strong {
+      display: block;
+      margin-bottom: 9px;
+    }
+
+    .spec-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .spec-tile {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      background: #10161d;
+      min-height: 92px;
+    }
+
+    .spec-tile b {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 6px;
+    }
+
+    .spec-tile span {
+      display: block;
+      font-size: 15px;
+      font-weight: 780;
+      color: var(--ink);
+    }
+
+    .code-line {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      border-radius: 7px;
+      border: 1px solid #2e3844;
+      background: #080b0f;
+      color: #dce4ec;
+      padding: 4px 8px;
+      font-family: "Cascadia Mono", Consolas, monospace;
+      font-size: 12px;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+
+    .file-list {
+      display: grid;
+      gap: 9px;
+    }
+
+    .file-item {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+      border-bottom: 1px solid #242c35;
+      padding: 8px 0;
+      font-size: 13px;
+    }
+
+    .file-item:last-child {
+      border-bottom: 0;
+    }
+
+    .file-item code {
+      color: #dce4ec;
+      font-family: "Cascadia Mono", Consolas, monospace;
+      font-size: 12px;
+    }
+
+    .wide-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .matrix-table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+    }
+
+    .matrix-table th,
+    .matrix-table td {
+      padding: 10px;
+      border-bottom: 1px solid #252e38;
+      border-right: 1px solid #252e38;
+      text-align: left;
+      font-size: 13px;
+    }
+
+    .matrix-table th {
+      color: var(--muted);
+      background: #111820;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .matrix-table tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .matrix-table th:last-child,
+    .matrix-table td:last-child {
+      border-right: 0;
+    }
+
+    .bar {
+      height: 9px;
+      border-radius: 999px;
+      background: #222b34;
+      overflow: hidden;
+      margin: 7px 0 10px;
+    }
+
+    .bar i {
+      display: block;
+      height: 100%;
+      width: 50%;
+      background: var(--blue);
+    }
+
+    .notice {
+      border-left: 4px solid var(--amber);
+      background: var(--amber-soft);
+      border-radius: 8px;
+      padding: 12px 13px;
+      color: #ffce8a;
+      font-size: 13px;
+    }
+
+    .collab-strip {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+      border: 1px solid #2b3036;
+      border-radius: 8px;
+      padding: 13px;
+      background:
+        linear-gradient(110deg, rgba(227, 6, 19, 0.24), transparent 42%),
+        linear-gradient(145deg, #080a0d, #141b22);
+      color: #f4f6f7;
+      margin-bottom: 16px;
+    }
+
+    .collab-strip p {
+      margin: 3px 0 0;
+      color: #c6cbd0;
+      font-size: 12px;
+    }
+
+    .footer-band {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+      background:
+        linear-gradient(110deg, rgba(227, 6, 19, 0.18), transparent 35%),
+        #080a0d;
+      color: #f7f9fb;
+      border-radius: 8px;
+      padding: 15px 18px;
+    }
+
+    .footer-band p {
+      margin: 0;
+      color: #c7d0da;
+      font-size: 13px;
+    }
+
+    @media (max-width: 1050px) {
+      .shell {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+        display: grid;
+        grid-template-columns: 1fr;
+      }
+
+      .nav {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .status-box {
+        margin-top: 0;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 760px) {
+      main {
+        padding: 14px;
+      }
+
+      .topbar,
+      .module-head,
+      .footer-band {
+        align-items: stretch;
+        flex-direction: column;
+        grid-template-columns: 1fr;
+      }
+
+      .topbar {
+        display: grid;
+      }
+
+      .actions {
+        justify-content: stretch;
+      }
+
+      .btn {
+        justify-content: center;
+        flex: 1 1 auto;
+      }
+
+      .cards,
+      .comparison {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .menu-grid,
+      .calibration-detail,
+      .spec-grid,
+      .wide-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .calibration-menu,
+      .collab-strip {
+        grid-template-columns: 1fr;
+      }
+
+      .control {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+
+      .nav {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 520px) {
+
+      .cards,
+      .comparison {
+        grid-template-columns: 1fr;
+      }
+
+      .menu-grid,
+      .calibration-detail,
+      .spec-grid,
+      .wide-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .heatmap {
+        grid-template-columns: 42px repeat(7, minmax(39px, 1fr));
+      }
+
+      .cell {
+        min-height: 38px;
+        padding: 5px;
+        font-size: 10px;
+      }
+
+      .segmented {
+        width: 100%;
+        grid-auto-flow: row;
+      }
+
+      .segmented button {
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .segmented button:last-child {
+        border-bottom: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="mark">TCU</div>
+        <div>
+          <h1>VW Group TCU Lab</h1>
+          <span>DQ250 / DQ381 / DQ500 / DL501 workflow</span>
+        </div>
+      </div>
+
+      <nav class="nav" aria-label="Main navigation">
+        <button class="active" type="button" data-page="dashboard">Dashboard</button>
+        <button type="button" data-page="calibration">Calibration</button>
+        <button type="button" data-page="shift-maps">Shift Maps</button>
+        <button type="button" data-page="torque-model">Torque Model</button>
+        <button type="button" data-page="log-review">Log Review</button>
+        <button type="button" data-page="export">Export</button>
+      </nav>
+
+      <div class="status-box">
+        <strong>Bench mode only</strong>
+        <p>No live vehicle writes. Use this screen to model, review, and approve calibrations before validated tooling.
+        </p>
+      </div>
+    </aside>
+
+    <main>
+      <div class="page active" data-page-panel="dashboard">
+        <section class="topbar">
+          <div>
+            <h2>VW Specialist TCU Calibrator</h2>
+            <p>Plug-and-play style offline workstation for DSG/S tronic drivability, clutch handover, torque
+              intervention, and 1-7 shift behavior.</p>
+          </div>
+          <div class="actions">
+            <select class="btn" id="unit-menu" aria-label="Units"><option value="metric">Metric</option><option value="imperial">Imperial</option></select>
+            <select class="btn" id="connector-menu" aria-label="Connector driver">
+              <option value="sim">Simulator</option>
+              <option value="openport2">OpenPort 2.0</option>
+              <option value="j2534">J2534</option>
+              <option value="obdlink">OBDLink</option>
+              <option value="raw-can">Raw CAN</option>
+            </select>
+            <button class="btn" type="button">Import Log</button>
+            <button class="btn" type="button">Compare Stock</button>
+            <button class="btn primary" type="button" id="simulate">Start Connection</button>
+            <span class="pill amber" id="connection-status">Toolkit idle</span>
+            <button class="btn locked" type="button"
+              title="Live flashing is intentionally disabled in this prototype">Flash Locked</button>
+          </div>
+        </section>
+
+        <section class="grid">
+          <div class="stack">
+            <section class="module">
+              <div class="module-head">
+                <div>
+                  <h3>Drivability Calibration</h3>
+                  <p class="hint">Adjust high-level map targets. The model recalculates heat, slip, and shift harshness
+                    instantly.</p>
+                </div>
+                <span class="pill green" id="profile-status">Street Smooth</span>
+              </div>
+
+              <div class="deep-card" style="margin-top: 14px; border-color: rgba(227,6,19,0.35);">
+                <strong>Supported Vehicle Fit</strong>
+                <span>
+                  Supports vehicles across Audi / VW / Porsche / Bentley / Lamborghini families.
+                </span>
+              </div>
+
+
+
+              <div class="collab-strip">
+                <div>
+                  <strong>VW specialist collaborator tuner: Stav Built</strong>
+                  <p>Working map review, road-log notes, and customer drivability targets are captured before any
+                    bench-tool workflow.</p>
+                </div>
+                <span class="pill red">RS titanium/red theme</span>
+              </div>
+
+              <div class="cards">
+                <div class="card">
+                  <div class="metric">Abuse index</div>
+                  <div class="value" id="abuse-value">28<small>/100</small></div>
+                </div>
+                <div class="card">
+                  <div class="metric">Clutch slip</div>
+                  <div class="value" id="slip-value">5.2<small>%</small></div>
+                </div>
+                <div class="card">
+                  <div class="metric">Oil temp rise</div>
+                  <div class="value" id="temp-value">7<small>C</small></div>
+                </div>
+                <div class="card">
+                  <div class="metric">Shift comfort</div>
+                  <div class="value" id="comfort-value">86<small>%</small></div>
+                </div>
+              </div>
+
+              <div class="toolbar">
+                <div class="segmented" role="group" aria-label="Calibration profile">
+                  <button class="active" type="button" data-profile="street">Street</button>
+                  <button type="button" data-profile="sport">Sport</button>
+                  <button type="button" data-profile="track">Track</button>
+                </div>
+                <span class="pill amber">Unsaved working map</span>
+              </div>
+
+              <div class="menu-grid" aria-label="Calibration menus">
+                <div class="menu-field">
+                  <label for="vehicle-menu">Vehicle</label>
+                  <select id="vehicle-menu">
+                    <option>Audi RS3 8Y 2.5 TFSI / DQ500</option>
+                    <option>Audi S3 / Golf R / DQ381</option>
+                    <option>Audi RS3 8V DQ500 baseline</option>
+                    <option>VW Golf R / S tronic (DQ381)</option>
+                    <option>VW Passat / Arteon / DQ500 reference</option>
+                    <option>Porsche Macan / 7-speed DSG (DQ500)</option>
+                    <option>Porsche Cayenne / 7-speed DSG (DQ500)</option>
+                    <option>Bentley Bentayga / AWD DSG (DL501)</option>
+                    <option>Lamborghini Urus / DSG (DQ500)</option>
+                    <option>Bentley Continental GT / DL501 reference</option>
+                  </select>
+                </div>
+                <div class="menu-field">
+                  <label for="map-menu">Calibration pack</label>
+                  <select id="map-menu">
+                    <option>Stav Built daily smooth</option>
+                    <option>OEM plus life-extender</option>
+                    <option>High torque street</option>
+                    <option>Track handover study</option>
+                  </select>
+                </div>
+                <div class="menu-field">
+                  <label for="drive-menu">Drive mode</label>
+                  <select id="drive-menu">
+                    <option>D comfort</option>
+                    <option>S performance</option>
+                    <option>Manual paddle</option>
+                    <option>Launch strategy</option>
+                  </select>
+                </div>
+                <div class="menu-field">
+                  <label for="session-menu">Review gate</label>
+                  <select id="session-menu">
+                    <option>Road log review</option>
+                    <option>Bench validation</option>
+                    <option>Thermal stress pass</option>
+                    <option>Customer sign-off</option>
+                  </select>
+                </div>
+                <div class="menu-field">
+                  <label for="project-mode-menu">Project mode</label>
+                  <select id="project-mode-menu">
+                    <option value="read_only">Read-only diagnostics</option>
+                  </select>
+                </div>
+                <div class="menu-field">
+                  <label for="driver-profile-menu">Cable translator</label>
+                  <select id="driver-profile-menu">
+                    <option>Simulator normalized signals</option>
+                    <option>OpenPort 2.0 via J2534 wrapper</option>
+                    <option>Generic J2534 pass-thru wrapper</option>
+                    <option>OBDLink STN serial wrapper</option>
+                    <option>Raw python-can wrapper</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="calibration-menu">
+                <div class="calibration-tabs" role="group" aria-label="Detailed calibration group">
+                  <button class="active" type="button" data-cal="clutch">Clutch</button>
+                  <button type="button" data-cal="torque">Torque</button>
+                  <button type="button" data-cal="shift">Shift</button>
+                  <button type="button" data-cal="thermal">Thermal</button>
+                </div>
+                <div class="calibration-detail" id="calibration-detail"></div>
+              </div>
+
+              <div class="controls">
+                <div class="control">
+                  <label for="takeoff">Take-off smoothing <span>Reduces low-speed bump and clutch bite
+                      shock</span></label>
+                  <input type="range" id="takeoff" min="0" max="100" value="68">
+                  <input class="number" type="number" min="0" max="100" value="68" data-for="takeoff"
+                    aria-label="Take-off smoothing value">
+                </div>
+                <div class="control">
+                  <label for="handover">Clutch handover blend <span>Balances overlap between odd/even clutch
+                      packs</span></label>
+                  <input type="range" id="handover" min="0" max="100" value="61">
+                  <input class="number" type="number" min="0" max="100" value="61" data-for="handover"
+                    aria-label="Clutch handover value">
+                </div>
+                <div class="control">
+                  <label for="torque">Torque intervention timing <span>Coordinates engine torque cut during shift
+                      sync</span></label>
+                  <input type="range" id="torque" min="0" max="100" value="54">
+                  <input class="number" type="number" min="0" max="100" value="54" data-for="torque"
+                    aria-label="Torque intervention value">
+                </div>
+                <div class="control">
+                  <label for="pressure">Clutch pressure ceiling <span>Modeled target, not a direct flashable
+                      value</span></label>
+                  <input type="range" id="pressure" min="0" max="100" value="46">
+                  <input class="number" type="number" min="0" max="100" value="46" data-for="pressure"
+                    aria-label="Clutch pressure value">
+                </div>
+                <div class="control">
+                  <label for="downshift">Downshift damping <span>Softens aggressive kickdown and paddle
+                      requests</span></label>
+                  <input type="range" id="downshift" min="0" max="100" value="58">
+                  <input class="number" type="number" min="0" max="100" value="58" data-for="downshift"
+                    aria-label="Downshift damping value">
+                </div>
+                <div class="control">
+                  <label for="kisspoint">Kiss-point adaptation <span>Models clutch touch-point learning and creep
+                      smoothness</span></label>
+                  <input type="range" id="kisspoint" min="0" max="100" value="52">
+                  <input class="number" type="number" min="0" max="100" value="52" data-for="kisspoint"
+                    aria-label="Kiss-point adaptation value">
+                </div>
+                <div class="control">
+                  <label for="thermal">Thermal protection bias <span>Raises the priority of oil-temp and repeated-shift
+                      protection</span></label>
+                  <input type="range" id="thermal" min="0" max="100" value="63">
+                  <input class="number" type="number" min="0" max="100" value="63" data-for="thermal"
+                    aria-label="Thermal protection value">
+                </div>
+                <div class="control">
+                  <label for="ramp">Pressure ramp shaping <span>Controls how quickly pressure target builds during
+                      clutch exchange</span></label>
+                  <input type="range" id="ramp" min="0" max="100" value="49">
+                  <input class="number" type="number" min="0" max="100" value="49" data-for="ramp"
+                    aria-label="Pressure ramp value">
+                </div>
+              </div>
+
+              <div class="module" style="box-shadow:none; margin-top:18px;">
+                <div class="module-head">
+                  <div>
+                    <h3>F1-Style Per-Gear Tuner Matrix</h3>
+                    <p class="hint">Precision edit targets for engineering review. Values remain offline until an authorized workflow exists.</p>
+                  </div>
+                  <span class="pill red">Read-only guarded</span>
+                </div>
+                <table class="matrix-table">
+                  <thead>
+                    <tr><th>Gear</th><th>Clutch</th><th>Shift RPM</th><th>Pressure Trim</th><th>Torque Cut</th><th>Ramp</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><td>1</td><td>K1</td><td><input class="number" value="3600"></td><td><input class="number" value="+4"></td><td><input class="number" value="72"></td><td><input class="number" value="48"></td></tr>
+                    <tr><td>2</td><td>K2</td><td><input class="number" value="4200"></td><td><input class="number" value="+3"></td><td><input class="number" value="68"></td><td><input class="number" value="46"></td></tr>
+                    <tr><td>3</td><td>K1</td><td><input class="number" value="5200"></td><td><input class="number" value="+6"></td><td><input class="number" value="62"></td><td><input class="number" value="52"></td></tr>
+                    <tr><td>4</td><td>K2</td><td><input class="number" value="5900"></td><td><input class="number" value="+7"></td><td><input class="number" value="58"></td><td><input class="number" value="55"></td></tr>
+                    <tr><td>5</td><td>K1</td><td><input class="number" value="6500"></td><td><input class="number" value="+8"></td><td><input class="number" value="54"></td><td><input class="number" value="58"></td></tr>
+                    <tr><td>6</td><td>K2</td><td><input class="number" value="6900"></td><td><input class="number" value="+8"></td><td><input class="number" value="52"></td><td><input class="number" value="60"></td></tr>
+                    <tr><td>7</td><td>K1</td><td><input class="number" value="7200"></td><td><input class="number" value="+5"></td><td><input class="number" value="50"></td><td><input class="number" value="56"></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            <section class="module">
+              <div class="module-head">
+                <div>
+                  <h3>Shift Pressure Heatmap</h3>
+                  <p class="hint">Relative requested clutch pressure by gear and load band for review, not raw TCU
+                    addresses.</p>
+                </div>
+                <span class="pill blue">7 gears</span>
+              </div>
+              <div class="heatmap" id="heatmap" aria-label="Shift pressure heatmap"></div>
+            </section>
+
+            <section class="module">
+              <div class="module-head">
+                <div>
+                  <h3>DQ500 Clutch Architecture</h3>
+                  <p class="hint">Reference view for K1/K2 torque path, reverse behavior, mechatronic control, and
+                    UDS-safe diagnostics.</p>
+                </div>
+                <span class="pill red">0BH 927 711 X</span>
+              </div>
+              <div class="comparison">
+                <div class="compare-card">
+                  <strong>K1 clutch pack</strong>
+                  <span class="metric">Odd gear path</span>
+                  <div class="bar"><i style="width: 86%"></i></div>
+                  <span class="metric">1 / 3 / 5 / 7 engagement model</span>
+                </div>
+                <div class="compare-card">
+                  <strong>K2 clutch pack</strong>
+                  <span class="metric">Even and reverse path</span>
+                  <div class="bar"><i style="width: 78%"></i></div>
+                  <span class="metric">2 / 4 / 6 / R engagement model</span>
+                </div>
+                <div class="compare-card">
+                  <strong>Mechatronic brain</strong>
+                  <span class="metric">Critical solenoids</span>
+                  <div class="bar"><i style="width: 92%"></i></div>
+                  <span class="metric">N472 / N436 / N440 / N471 logic watch</span>
+                </div>
+              </div>
+            </section>
+
+            <section class="module">
+              <div class="module-head">
+                <div>
+                  <h3>Read-Only UDS Profile</h3>
+                  <p class="hint">Synced from the VS Code project profile for validating a safe TCU communication path.
+                  </p>
+                </div>
+                <span class="pill blue">configs/dq500_readonly.yaml</span>
+              </div>
+              <div class="spec-grid">
+                <div class="spec-tile">
+                  <b>Request CAN ID</b>
+                  <span>0x7E1</span>
+                </div>
+                <div class="spec-tile">
+                  <b>Response CAN ID</b>
+                  <span>0x7E9</span>
+                </div>
+                <div class="spec-tile">
+                  <b>Bitrate</b>
+                  <span>500 kbit/s</span>
+                </div>
+                <div class="spec-tile">
+                  <b>Default interface</b>
+                  <span>PCAN_USBBUS1</span>
+                </div>
+                <div class="spec-tile">
+                  <b>Session request</b>
+                  <span class="code-line">02 10 03 00 00 00 00 00</span>
+                </div>
+                <div class="spec-tile">
+                  <b>Success response</b>
+                  <span class="code-line">02 50 03 ...</span>
+                </div>
+                <div class="spec-tile">
+                  <b>Poll interval</b>
+                  <span>350 ms</span>
+                </div>
+                <div class="spec-tile">
+                  <b>Mode</b>
+                  <span>Read-only diagnostics</span>
+                </div>
+              </div>
+            </section>
+
+            <section class="module">
+              <div class="module-head">
+                <div>
+                  <h3>Live DID Stream Targets</h3>
+                  <p class="hint">Candidate DIDs used by the Python console stream. Validate identifiers against exact
+                    TCU software before relying on units.</p>
+                </div>
+                <span class="pill amber">Candidate values</span>
+              </div>
+              <div class="comparison">
+                <div class="compare-card">
+                  <strong>0x1901</strong>
+                  <span class="metric">K1 clutch pressure candidate</span>
+                  <div class="bar"><i style="width: 73%"></i></div>
+                  <span class="code-line">03 22 19 01 00 00 00 00</span>
+                </div>
+                <div class="compare-card">
+                  <strong>0x1902</strong>
+                  <span class="metric">K2 clutch pressure candidate</span>
+                  <div class="bar"><i style="width: 69%"></i></div>
+                  <span class="code-line">03 22 19 02 00 00 00 00</span>
+                </div>
+                <div class="compare-card">
+                  <strong>0x1905</strong>
+                  <span class="metric">Gearbox oil pressure/temp candidate</span>
+                  <div class="bar"><i style="width: 58%"></i></div>
+                  <span class="code-line">03 22 19 05 00 00 00 00</span>
+                </div>
+              </div>
+            </section>
+
+            <section class="module">
+              <div class="module-head">
+                <div>
+                  <h3>Plug-And-Play Hardware Manifest</h3>
+                  <p class="hint">Shop setup checklist from the example hardware manifest and BOM docs.</p>
+                </div>
+                <span class="pill green">Read-only ready</span>
+              </div>
+              <div class="spec-grid">
+                <div class="spec-tile">
+                  <b>Primary CAN</b>
+                  <span>CAN/CAN FD USB</span>
+                </div>
+                <div class="spec-tile">
+                  <b>Programming path</b>
+                  <span>SAE J2534 authorized only</span>
+                </div>
+                <div class="spec-tile">
+                  <b>Bench supply</b>
+                  <span>12-14.5 V / 30-60 A</span>
+                </div>
+                <div class="spec-tile">
+                  <b>Safety</b>
+                  <span>E-stop + fused power</span>
+                </div>
+                <div class="spec-tile">
+                  <b>Harness adapters</b>
+                  <span>DQ250 / DQ381 / DQ500 / DL501</span>
+                </div>
+                <div class="spec-tile">
+                  <b>PCB blocks</b>
+                  <span>CAN FD, isolation, TVS, ADC</span>
+                </div>
+                <div class="spec-tile">
+                  <b>Blocked</b>
+                  <span>Seed-key / flash writes</span>
+                </div>
+                <div class="spec-tile">
+                  <b>Console stream</b>
+                  <span>logs/live_did_stream.csv</span>
+                </div>
+              </div>
+            </section>
+
+            <section class="module">
+              <div class="module-head">
+                <div>
+                  <h3>Map Comparison</h3>
+                  <p class="hint">Design goal: smoother low-load behavior while keeping high-load clutch control
+                    disciplined.</p>
+                </div>
+              </div>
+              <div class="comparison">
+                <div class="compare-card">
+                  <strong>Stock</strong>
+                  <span class="metric">Comfort</span>
+                  <div class="bar"><i style="width: 58%"></i></div>
+                  <span class="metric">Protection</span>
+                  <div class="bar"><i style="width: 64%"></i></div>
+                </div>
+                <div class="compare-card">
+                  <strong>TVS-style target</strong>
+                  <span class="metric">Comfort</span>
+                  <div class="bar"><i style="width: 82%"></i></div>
+                  <span class="metric">Protection</span>
+                  <div class="bar"><i style="width: 78%"></i></div>
+                </div>
+                <div class="compare-card">
+                  <strong>Working map</strong>
+                  <span class="metric">Comfort</span>
+                  <div class="bar"><i id="comfort-bar" style="width: 86%"></i></div>
+                  <span class="metric">Protection</span>
+                  <div class="bar"><i id="protect-bar" style="width: 79%"></i></div>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <aside class="stack">
+            <section class="module">
+              <div class="module-head">
+                <div>
+                  <h3>Gearbox Health Score</h3>
+                  <p class="hint">Composite score from simulated slip, heat, pressure, and harshness.</p>
+                </div>
+              </div>
+              <div class="gauge">
+                <div class="needle" id="needle"></div>
+                <div class="gauge-center"><span id="health-value">88</span><small>health score</small></div>
+              </div>
+            </section>
+
+            <section class="module">
+              <div class="module-head">
+                <div>
+                  <h3>Validation Gates</h3>
+                  <p class="hint">Required checks before any real-world calibration process.</p>
+                </div>
+              </div>
+              <div class="timeline">
+                <div class="event">
+                  <time>Step 01</time>
+                  <span>VIN and TCU family confirmed</span>
+                  <span class="pill green">Pass</span>
+                </div>
+                <div class="event">
+                  <time>Step 02</time>
+                  <span>Baseline logs imported</span>
+                  <span class="pill amber">Needed</span>
+                </div>
+                <div class="event">
+                  <time>Step 03</time>
+                  <span>Temperature envelope reviewed</span>
+                  <span class="pill amber">Needed</span>
+                </div>
+                <div class="event">
+                  <time>Step 04</time>
+                  <span>Live write capability</span>
+                  <span class="pill red">Disabled</span>
+                </div>
+                <div class="event">
+                  <time>Step 05</time>
+                  <span>UDS diagnostic session ping</span>
+                  <span class="pill blue">Read-only</span>
+                </div>
+              </div>
+            </section>
+
+            <section class="module">
+              <div class="module-head">
+                <div>
+                  <h3>Event Monitor</h3>
+                  <p class="hint">Simulated log feedback from the current map.</p>
+                </div>
+              </div>
+              <div class="timeline" id="events"></div>
+            </section>
+
+            <section class="module">
+              <div class="module-head">
+                <div>
+                  <h3>VS Code Project Pack</h3>
+                  <p class="hint">Supporting files now included for UI, Python diagnostics, docs, sample data, and
+                    tests.</p>
+                </div>
+                <span class="pill green">Ready</span>
+              </div>
+              <div class="file-list">
+                <div class="file-item">
+                  <code>src/vw_tcu_calibrator/cli.py</code>
+                  <span class="pill blue">UDS CLI</span>
+                </div>
+                <div class="file-item">
+                  <code>configs/dq500_readonly.yaml</code>
+                  <span class="pill blue">Profile</span>
+                </div>
+                <div class="file-item">
+                  <code>data/sample_dq500_stream.csv</code>
+                  <span class="pill green">Sample</span>
+                </div>
+                <div class="file-item">
+                  <code>docs/HARDWARE_BOM.md</code>
+                  <span class="pill amber">BOM</span>
+                </div>
+                <div class="file-item">
+                  <code>tests/test_uds.py</code>
+                  <span class="pill green">Tests</span>
+                </div>
+              </div>
+            </section>
+
+            <div class="notice">
+              Real TCU calibration should be performed only with lawful access, proper bench tools, controlled testing,
+              and a qualified calibration engineer. This prototype avoids raw memory maps, seed-key workflows, and live
+              flashing.
+            </div>
+          </aside>
+        </section>
+
+        <section class="footer-band">
+          <div>
+            <strong>Next build direction</strong>
+            <p>Connect the UI to the Python read-only stream, plot K1/K2/oil channels live, and add project
+              import/export around the YAML hardware manifest.</p>
+          </div>
+          <button class="btn primary" type="button" id="export">Export Review Pack</button>
+        </section>
+      </div>
+
+      <div class="page" data-page-panel="calibration">
+        <section class="topbar">
+          <div>
+            <h2>Calibration Workspace</h2>
+            <p>Deep DSG/S tronic calibration planning for clutch behavior, pressure ramps, adaptation quality, and
+              validation gates.</p>
+          </div>
+          <div class="actions">
+            <button class="btn" type="button" data-page-jump="dashboard">Back To Dashboard</button>
+            <button class="btn primary" type="button" data-page-jump="export">Prepare Export</button>
+          </div>
+        </section>
+
+        <section class="wide-grid">
+          <div class="module">
+            <div class="module-head">
+              <div>
+                <h3>Calibration Packs</h3>
+                <p class="hint">Select the target behavior before moving values into a tuner review pack.</p>
+              </div>
+              <span class="pill amber">Offline</span>
+            </div>
+            <div class="comparison">
+              <div class="compare-card">
+                <strong>Stav Built Daily Smooth</strong>
+                <span class="metric">Traffic creep, parking, low-speed handover</span>
+                <div class="bar"><i style="width: 88%"></i></div>
+              </div>
+              <div class="compare-card">
+                <strong>High Torque Street</strong>
+                <span class="metric">Pressure discipline with restrained shock</span>
+                <div class="bar"><i style="width: 76%"></i></div>
+              </div>
+              <div class="compare-card">
+                <strong>Track Handover Study</strong>
+                <span class="metric">Repeatability, heat control, fast exchange</span>
+                <div class="bar"><i style="width: 69%"></i></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="module">
+            <div class="module-head">
+              <div>
+                <h3>Critical Calibration Channels</h3>
+                <p class="hint">High-level labels for review. These are not raw memory addresses.</p>
+              </div>
+            </div>
+            <table class="matrix-table">
+              <thead>
+                <tr>
+                  <th>Group</th>
+                  <th>Focus</th>
+                  <th>Risk</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>K1/K2 balance</td>
+                  <td>Odd/even clutch split</td>
+                  <td>Handover flare</td>
+                </tr>
+                <tr>
+                  <td>Kiss point</td>
+                  <td>Creep and launch touch point</td>
+                  <td>Low-speed judder</td>
+                </tr>
+                <tr>
+                  <td>Pressure ramp</td>
+                  <td>Build rate during exchange</td>
+                  <td>Shift shock</td>
+                </tr>
+                <tr>
+                  <td>Thermal bias</td>
+                  <td>Repeated pull protection</td>
+                  <td>Heat soak</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="module">
+          <div class="module-head">
+            <div>
+              <h3>Calibration Checklist</h3>
+              <p class="hint">Use this as the operator flow before any real bench-tool process.</p>
+            </div>
+          </div>
+          <div class="timeline">
+            <div class="event"><time>01</time><span>Confirm gearbox family and mechatronic revision</span><span
+                class="pill green">Required</span></div>
+            <div class="event"><time>02</time><span>Load baseline logs and customer complaint notes</span><span
+                class="pill amber">Pending</span></div>
+            <div class="event"><time>03</time><span>Run read-only UDS handshake and DID stream</span><span
+                class="pill blue">Safe</span></div>
+            <div class="event"><time>04</time><span>Export review pack for tuner approval</span><span
+                class="pill amber">Pending</span></div>
+          </div>
+        </section>
+      </div>
+
+      <div class="page" data-page-panel="shift-maps">
+        <section class="topbar">
+          <div>
+            <h2>Shift Maps</h2>
+            <p>Visualize the 7-speed clutch path, gear schedule intent, and load-band pressure map.</p>
+          </div>
+          <div class="actions">
+            <button class="btn primary" type="button" data-page-jump="calibration">Tune Calibration</button>
+          </div>
+        </section>
+
+        <section class="wide-grid">
+          <div class="module">
+            <div class="module-head">
+              <div>
+                <h3>DQ500 Gear Path</h3>
+                <p class="hint">K1 drives odd gears. K2 drives even gears and reverse.</p>
+              </div>
+              <span class="pill red">K1 / K2</span>
+            </div>
+            <table class="matrix-table">
+              <thead>
+                <tr>
+                  <th>Gear</th>
+                  <th>Clutch</th>
+                  <th>Use Case</th>
+                  <th>Watch</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>K1</td>
+                  <td>Launch / creep</td>
+                  <td>Bite ramp</td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>K2</td>
+                  <td>Low-speed handover</td>
+                  <td>Overlap</td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td>K1</td>
+                  <td>Street pull</td>
+                  <td>Torque cut timing</td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td>K2</td>
+                  <td>Mid-load cruise</td>
+                  <td>Pressure target</td>
+                </tr>
+                <tr>
+                  <td>5</td>
+                  <td>K1</td>
+                  <td>Highway acceleration</td>
+                  <td>Thermal rise</td>
+                </tr>
+                <tr>
+                  <td>6</td>
+                  <td>K2</td>
+                  <td>High-speed load</td>
+                  <td>Slip control</td>
+                </tr>
+                <tr>
+                  <td>7</td>
+                  <td>K1</td>
+                  <td>Overdrive</td>
+                  <td>Low-load smoothness</td>
+                </tr>
+                <tr>
+                  <td>R</td>
+                  <td>K2</td>
+                  <td>Reverse creep</td>
+                  <td>Judder</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="module">
+            <div class="module-head">
+              <div>
+                <h3>Load Band Schedule</h3>
+                <p class="hint">Representative schedule bands for calibration review.</p>
+              </div>
+            </div>
+            <div class="spec-grid">
+              <div class="spec-tile"><b>Low load</b><span>Comfort shift bias</span></div>
+              <div class="spec-tile"><b>Mid load</b><span>Balanced handover</span></div>
+              <div class="spec-tile"><b>High load</b><span>Pressure discipline</span></div>
+              <div class="spec-tile"><b>Manual</b><span>Paddle request damping</span></div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div class="page" data-page-panel="torque-model">
+        <section class="topbar">
+          <div>
+            <h2>Torque Model</h2>
+            <p>Model gearbox torque communication, intervention timing, clutch pressure response, and protection bias.
+            </p>
+          </div>
+          <div class="actions">
+            <button class="btn" type="button" data-page-jump="log-review">Review Logs</button>
+            <button class="btn primary" type="button" id="torque-simulate">Sim Torque Event</button>
+          </div>
+        </section>
+
+        <section class="wide-grid">
+          <div class="module">
+            <div class="module-head">
+              <div>
+                <h3>Torque Intervention Chain</h3>
+                <p class="hint">Read as a system model, not as direct write instructions.</p>
+              </div>
+            </div>
+            <div class="timeline">
+              <div class="event"><time>01</time><span>Driver request and engine torque estimate</span><span
+                  class="pill blue">Input</span></div>
+              <div class="event"><time>02</time><span>TCU predicts clutch exchange load</span><span
+                  class="pill blue">Model</span></div>
+              <div class="event"><time>03</time><span>Torque reduction window coordinates shift sync</span><span
+                  class="pill amber">Control</span></div>
+              <div class="event"><time>04</time><span>Pressure ramp closes the exchange</span><span
+                  class="pill green">Protect</span></div>
+            </div>
+          </div>
+
+          <div class="module">
+            <div class="module-head">
+              <div>
+                <h3>Solenoid Watch</h3>
+                <p class="hint">Critical mechatronic channels to trend during read-only log review.</p>
+              </div>
+              <span class="pill red">0BH 927 711 X</span>
+            </div>
+            <div class="spec-grid">
+              <div class="spec-tile"><b>N472</b><span>Pressure logic watch</span></div>
+              <div class="spec-tile"><b>N436</b><span>Clutch control watch</span></div>
+              <div class="spec-tile"><b>N440</b><span>Shift control watch</span></div>
+              <div class="spec-tile"><b>N471</b><span>Regulation watch</span></div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div class="page" data-page-panel="log-review">
+        <section class="topbar">
+          <div>
+            <h2>Log Review</h2>
+            <p>Review the live read-only stream targets, sample data, pressure jump behavior, and health-score inputs.
+            </p>
+          </div>
+          <div class="actions">
+            <button class="btn" type="button">Import CSV</button>
+            <button class="btn primary" type="button" data-page-jump="export">Export Report</button>
+          </div>
+        </section>
+
+        <section class="wide-grid">
+          <div class="module">
+            <div class="module-head">
+              <div>
+                <h3>Live Stream DIDs</h3>
+                <p class="hint">Console stream writes to logs/live_did_stream.csv.</p>
+              </div>
+              <span class="pill blue">0x7E9 RX</span>
+            </div>
+            <table class="matrix-table">
+              <thead>
+                <tr>
+                  <th>DID</th>
+                  <th>Signal</th>
+                  <th>Request</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>0x1901</td>
+                  <td>K1 clutch pressure candidate</td>
+                  <td><span class="code-line">03 22 19 01 00 00 00 00</span></td>
+                </tr>
+                <tr>
+                  <td>0x1902</td>
+                  <td>K2 clutch pressure candidate</td>
+                  <td><span class="code-line">03 22 19 02 00 00 00 00</span></td>
+                </tr>
+                <tr>
+                  <td>0x1905</td>
+                  <td>Gearbox oil pressure/temp candidate</td>
+                  <td><span class="code-line">03 22 19 05 00 00 00 00</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="module">
+            <div class="module-head">
+              <div>
+                <h3>Sample Stream Snapshot</h3>
+                <p class="hint">Representative values from data/sample_dq500_stream.csv.</p>
+              </div>
+            </div>
+            <div class="timeline">
+              <div class="event"><time>0.00s</time><span>K1 36.5 bar / K2 34.5 bar / oil 88 raw</span><span
+                  class="pill green">Stable</span></div>
+              <div class="event"><time>0.70s</time><span>K1 47.8 bar / K2 43.2 bar / oil 94 raw</span><span
+                  class="pill blue">Rising</span></div>
+              <div class="event"><time>1.05s</time><span>K1 53.4 bar / K2 48.8 bar / oil 96 raw</span><span
+                  class="pill amber">Jump</span></div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div class="page" data-page-panel="export">
+        <section class="topbar">
+          <div>
+            <h2>Export Center</h2>
+            <p>Package the current calibration settings, DQ500 profile, UDS metadata, safety boundary, and project file
+              list.</p>
+          </div>
+          <div class="actions">
+            <button class="btn" type="button" data-page-jump="dashboard">Review Dashboard</button>
+            <button class="btn primary" type="button" id="export-page-button">Export Review Pack</button>
+          </div>
+        </section>
+
+        <section class="wide-grid">
+          <div class="module">
+            <div class="module-head">
+              <div>
+                <h3>Review Pack Contents</h3>
+                <p class="hint">Included in the generated JSON package.</p>
+              </div>
+              <span class="pill green">Ready</span>
+            </div>
+            <div class="file-list">
+              <div class="file-item"><code>vehicle + gearbox profile</code><span class="pill green">Included</span>
+              </div>
+              <div class="file-item"><code>K1/K2 clutch architecture</code><span class="pill green">Included</span>
+              </div>
+              <div class="file-item"><code>UDS IDs + DID requests</code><span class="pill green">Included</span></div>
+              <div class="file-item"><code>current slider controls</code><span class="pill green">Included</span></div>
+              <div class="file-item"><code>health/abuse/comfort score</code><span class="pill green">Included</span>
+              </div>
+              <div class="file-item"><code>SecurityAccess/write boundary</code><span class="pill red">Blocked</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="module">
+            <div class="module-head">
+              <div>
+                <h3>Operator Commands</h3>
+                <p class="hint">VS Code commands for dry-run and read-only hardware stream.</p>
+              </div>
+            </div>
+            <div class="timeline">
+              <div class="event"><time>Dry</time><span class="code-line">python -m vw_tcu_calibrator.cli --config
+                  configs/dq500_readonly.yaml --dry-run</span><span class="pill blue">Mock</span></div>
+              <div class="event"><time>Live</time><span class="code-line">python -m vw_tcu_calibrator.cli --config
+                  configs/dq500_readonly.yaml --stream</span><span class="pill green">Read</span></div>
+              <div class="event"><time>Test</time><span class="code-line">python -m pytest</span><span
+                  class="pill amber">Verify</span></div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const ranges = [...document.querySelectorAll('input[type="range"]')];
+    const numbers = [...document.querySelectorAll('.number[data-for]')];
+    const abuseValueEl = document.querySelector('#abuse-value');
+    const tempValueEl = document.querySelector('#temp-value');
+    const connectionStatusEl = document.querySelector('#connection-status');
+    const connectorMenuEl = document.querySelector('#connector-menu');
+    const unitMenuEl = document.querySelector('#unit-menu');
+    const heatmap = document.querySelector('#heatmap');
+    const events = document.querySelector('#events');
+    const profileStatus = document.querySelector('#profile-status');
+    const calibrationDetail = document.querySelector('#calibration-detail');
+
+    const profileValues = {
+      street: { takeoff: 72, handover: 64, torque: 58, pressure: 42, downshift: 62, kisspoint: 56, thermal: 66, ramp: 48, label: 'Street Smooth' },
+      sport: { takeoff: 55, handover: 58, torque: 66, pressure: 62, downshift: 46, kisspoint: 52, thermal: 60, ramp: 58, label: 'Sport Balanced' },
+      track: { takeoff: 35, handover: 50, torque: 78, pressure: 78, downshift: 34, kisspoint: 46, thermal: 74, ramp: 70, label: 'Track Firm' }
+    };
+
+    const calibrationGroups = {
+      clutch: [
+        ['K1/K2 balance', 'Odd/even clutch load split and handover symmetry'],
+        ['Creep bite ramp', 'Low-speed bite-in shape for parking and traffic'],
+        ['Kiss-point learn', 'Adaptation health and post-service relearn tracking']
+      ],
+      torque: [
+        ['CAN torque honesty', 'Keeps gearbox model aligned with engine torque reporting'],
+        ['Shift torque cut', 'Timing window for synchronization without harshness'],
+        ['Limiter strategy', 'Soft ceiling model for tuned engine output']
+      ],
+      shift: [
+        ['D-mode schedule', 'Earlier smooth shifts without lugging the gearbox'],
+        ['S-mode schedule', 'Higher RPM targets with controlled pressure ramps'],
+        ['Paddle response', 'Fast request handling with low-load damping']
+      ],
+      thermal: [
+        ['Oil temp envelope', 'Heat rise prediction under repeated pulls'],
+        ['Cool-down logic', 'Recovery gates before aggressive shift requests'],
+        ['Abuse counter', 'Flags repeated slip, shock, and high-temp events']
+      ]
+    };
+
+    function clamp(value) {
+      return Math.max(0, Math.min(100, Number(value) || 0));
+    }
+
+    function values() {
+      return Object.fromEntries(ranges.map((range) => [range.id, Number(range.value)]));
+    }
+
+    function setValue(id, value) {
+      const safe = clamp(value);
+      document.querySelector(`#${id}`).value = safe;
+      document.querySelector(`[data-for="${id}"]`).value = safe;
+    }
+
+    function computeScore() {
+      const v = values();
+      const smooth = (v.takeoff * 0.19) + (v.handover * 0.18) + (v.torque * 0.13) + (v.downshift * 0.15) + (v.kisspoint * 0.12) + (v.thermal * 0.09) + ((100 - Math.abs(v.pressure - 55)) * 0.08) + ((100 - Math.abs(v.ramp - 55)) * 0.06);
+      const abuse = clamp(100 - smooth + Math.max(0, v.pressure - 70) * 0.55 + Math.max(0, v.ramp - 72) * 0.28 + Math.max(0, 42 - v.takeoff) * 0.35 - v.thermal * 0.08);
+      const slip = Math.max(2.1, 12 - (v.pressure * 0.08) - (v.handover * 0.035) - (v.kisspoint * 0.025) + (100 - v.torque) * 0.018);
+      const temp = Math.round(4 + abuse * 0.22 + Math.max(0, v.pressure - 65) * 0.18 + Math.max(0, 48 - v.thermal) * 0.1);
+      const comfort = clamp(Math.round(smooth - Math.max(0, v.pressure - 68) * 0.32 - Math.max(0, v.ramp - 76) * 0.25));
+      const protection = clamp(Math.round(50 + v.pressure * 0.22 + v.torque * 0.13 + v.handover * 0.08 + v.thermal * 0.22 - abuse * 0.1));
+      const health = clamp(Math.round(104 - abuse * 0.55 - slip * 0.9 - temp * 0.18));
+      return { abuse: Math.round(abuse), slip, temp, comfort, protection, health };
+    }
+
+    function renderCalibrationGroup(group = 'clutch') {
+      calibrationDetail.innerHTML = calibrationGroups[group].map(([title, body]) => `
+        <div class="deep-card">
+          <strong>${title}</strong>
+          <span>${body}</span>
+        </div>
+      `).join('');
+    }
+
+    function renderHeatmap() {
+      const v = values();
+      const rows = ['Low', 'Mid', 'High'];
+      const cells = ['Load', '1', '2', '3', '4', '5', '6', '7'].map((item) => `<div class="cell head">${item}</div>`);
+
+      rows.forEach((row, rowIndex) => {
+        cells.push(`<div class="cell head">${row}</div>`);
+        for (let gear = 1; gear <= 7; gear += 1) {
+          const base = 36 + rowIndex * 18 + gear * 2.8;
+          const pressure = Math.round(base + v.pressure * 0.2 + v.ramp * 0.06 - v.takeoff * (rowIndex === 0 ? 0.12 : 0.03) + v.torque * 0.06 - v.thermal * 0.025);
+          const tone = pressure > 72 ? 'map-high' : pressure > 56 ? 'map-mid' : 'map-low';
+          cells.push(`<div class="cell ${tone}">${pressure}</div>`);
+        }
+      });
+
+      heatmap.innerHTML = cells.join('');
+    }
+
+    function renderEvents(score) {
+      const items = [
+        ['Idle creep', score.comfort > 74 ? 'Low vibration predicted' : 'Review clutch bite ramp', score.comfort > 74 ? 'green' : 'amber'],
+        ['2-3 upshift', score.abuse < 40 ? 'Clean torque handover' : 'Firm shift shock risk', score.abuse < 40 ? 'green' : 'red'],
+        ['Kickdown', values().downshift > 48 ? 'Damped paddle response' : 'Aggressive request profile', values().downshift > 48 ? 'blue' : 'amber'],
+        ['Thermal', score.temp < 16 ? 'Within modeled envelope' : 'Heat rise needs review', score.temp < 16 ? 'green' : 'red'],
+        ['Adaptation', values().kisspoint > 48 ? 'Kiss-point model stable' : 'Learning pass recommended', values().kisspoint > 48 ? 'green' : 'amber']
+      ];
+
+      events.innerHTML = items.map(([time, text, tone]) => `
+        <div class="event">
+          <time>${time}</time>
+          <span>${text}</span>
+          <span class="pill ${tone}">${tone === 'green' ? 'OK' : tone === 'red' ? 'Risk' : 'Watch'}</span>
+        </div>
+      `).join('');
+    }
+
+    function update() {
+      numbers.forEach((input) => {
+        input.value = document.querySelector(`#${input.dataset.for}`).value;
+      });
+      const score = computeScore();
+      document.querySelector('#abuse-value').innerHTML = `${score.abuse}<small>/100</small>`;
+      document.querySelector('#slip-value').innerHTML = `${score.slip.toFixed(1)}<small>%</small>`;
+      document.querySelector('#temp-value').innerHTML = `${score.temp}<small>C</small>`;
+      document.querySelector('#comfort-value').innerHTML = `${score.comfort}<small>%</small>`;
+      document.querySelector('#comfort-bar').style.width = `${score.comfort}%`;
+      document.querySelector('#protect-bar').style.width = `${score.protection}%`;
+      document.querySelector('#health-value').textContent = score.health;
+      document.querySelector('#needle').style.transform = `rotate(${(score.health / 100) * 170 - 85}deg)`;
+      renderHeatmap();
+      renderEvents(score);
+    }
+
+    ranges.forEach((range) => {
+      range.addEventListener('input', update);
+    });
+
+    numbers.forEach((input) => {
+      input.addEventListener('input', () => {
+        setValue(input.dataset.for, input.value);
+        update();
+      });
+    });
+
+    document.querySelectorAll('[data-profile]').forEach((button) => {
+      button.addEventListener('click', () => {
+        document.querySelectorAll('[data-profile]').forEach((item) => item.classList.remove('active'));
+        button.classList.add('active');
+        const profile = profileValues[button.dataset.profile];
+        Object.entries(profile).forEach(([key, value]) => {
+          if (key !== 'label') setValue(key, value);
+        });
+        profileStatus.textContent = profile.label;
+        update();
+      });
+    });
+
+    document.querySelectorAll('[data-cal]').forEach((button) => {
+      button.addEventListener('click', () => {
+        document.querySelectorAll('[data-cal]').forEach((item) => item.classList.remove('active'));
+        button.classList.add('active');
+        renderCalibrationGroup(button.dataset.cal);
+      });
+    });
+
+    let toolkitConn = {
+      active: false,
+      abort: null,
+    };
+
+    async function connectToolkitStream({
+      url,
+      onSnapshot,
+      onError,
+    }) {
+      toolkitConn.abort?.abort?.();
+      const controller = new AbortController();
+      toolkitConn.abort = controller;
+
+      const resp = await fetch(url, {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' },
+        signal: controller.signal,
+      });
+
+      if (!resp.ok || !resp.body) {
+        throw new Error(`Toolkit stream HTTP ${resp.status}`);
+      }
+
+      const reader = resp.body.getReader();
+      const decoder = new TextDecoder();
+      let buf = '';
+
+      while (!controller.signal.aborted) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buf += decoder.decode(value, { stream: true });
+
+        // newline-delimited JSON
+        let idx;
+        while ((idx = buf.indexOf('\n')) >= 0) {
+          const line = buf.slice(0, idx).trim();
+          buf = buf.slice(idx + 1);
+          if (!line) continue;
+
+          try {
+            const msg = JSON.parse(line);
+            if (msg.type === 'snapshot') {
+              onSnapshot(msg);
+            }
+          } catch (e) {
+            // ignore partial/non-JSON
+          }
+        }
+      }
+    }
+
+    function applyToolkitSnapshot(msg) {
+      const oilTemp = msg.oil_temp_c;
+      const k1 = msg.k1_clutch_pressure_candidate_bar;
+      const k2 = msg.k2_clutch_pressure_candidate_bar;
+      const rpm = msg.rpm;
+
+      // Abuse index now primarily reacts to oil temp >= 130C
+      // We keep existing slider-based score, but override the displayed values when stream exists.
+      if (oilTemp !== null && oilTemp !== undefined && !Number.isNaN(oilTemp)) {
+        const metricUnits = unitMenuEl.value === 'metric';
+        const displayTemp = metricUnits ? oilTemp : (oilTemp * 9 / 5) + 32;
+        const tempUnit = metricUnits ? 'C' : 'F';
+        tempValueEl.innerHTML = `${Math.round(displayTemp)}<small>${tempUnit}</small>`;
+
+        const abuseEl = abuseValueEl;
+        const shouldGlow = oilTemp >= 130;
+
+        // map oil temp to abuse index (0..100), tuned for UI prototyping
+        const abuse = clamp(Math.round((oilTemp - 70) * 1.2));
+        abuseEl.innerHTML = `${abuse}<small>/100</small>`;
+
+        // glow red behavior: when >=130C turn abuse index card to red
+        const card = abuseEl.closest('.card');
+        const gauge = document.querySelector('.gauge');
+        if (card) {
+          card.classList.toggle('hot-abuse', shouldGlow);
+        }
+        if (gauge) {
+          gauge.classList.toggle('hot-health', shouldGlow);
+        }
+        if (msg.abuse_index !== null && msg.abuse_index !== undefined && !Number.isNaN(msg.abuse_index)) {
+          document.querySelector('#health-value').textContent = Math.max(0, Math.min(100, Math.round(100 - msg.abuse_index * 0.42)));
+        }
+
+        // also feed "thermal" slider as a visual proxy without changing calibration values
+        // (keeps UI consistent while not claiming the slider is a real parameter write)
+        if (shouldGlow) {
+          // no-op for now
+        }
+      }
+
+      if (k1 !== null && k1 !== undefined && !Number.isNaN(k1)) {
+        // show clutch slip proxy as existing UI field
+        // (proto only; not raw ECU units)
+      }
+      if (k2 !== null && k2 !== undefined && !Number.isNaN(k2)) {
+        // no-op
+      }
+
+      renderEvents(computeScore());
+    }
+
+        document.querySelector('#simulate').addEventListener('click', async () => {
+      if (toolkitConn.active) return;
+      toolkitConn.active = true;
+      try {
+        const url = 'http://127.0.0.1:8765/stream';
+        connectionStatusEl.textContent = `Connecting via ${connectorMenuEl.value}`;
+        connectionStatusEl.className = 'pill blue';
+        document.querySelector('#simulate').classList.add('locked');
+        await connectToolkitStream({
+          url,
+          onSnapshot: (msg) => {
+            connectionStatusEl.textContent = `Live ${connectorMenuEl.value}`;
+            connectionStatusEl.className = 'pill green';
+            applyToolkitSnapshot(msg);
+          },
+          onError: (e) => console.error(e),
+        });
+      } catch (e) {
+        console.error(e);
+        connectionStatusEl.textContent = 'Toolkit offline';
+        connectionStatusEl.className = 'pill red';
+      } finally {
+        toolkitConn.active = false;
+        document.querySelector('#simulate').classList.remove('locked');
+      }
+    });
+
+    function showPage(page) {
+      document.querySelectorAll('[data-page-panel]').forEach((panel) => {
+        panel.classList.toggle('active', panel.dataset.pagePanel === page);
+      });
+      document.querySelectorAll('[data-page]').forEach((button) => {
+        button.classList.toggle('active', button.dataset.page === page);
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    document.querySelectorAll('[data-page]').forEach((button) => {
+      button.addEventListener('click', () => showPage(button.dataset.page));
+    });
+
+    document.querySelectorAll('[data-page-jump]').forEach((button) => {
+      button.addEventListener('click', () => showPage(button.dataset.pageJump));
+    });
+
+    document.querySelector('#torque-simulate').addEventListener('click', () => {
+      setValue('torque', clamp(Number(document.querySelector('#torque').value) + 6));
+      setValue('pressure', clamp(Number(document.querySelector('#pressure').value) + 5));
+      setValue('ramp', clamp(Number(document.querySelector('#ramp').value) + 4));
+      update();
+      showPage('dashboard');
+    });
+
+    function exportReviewPack() {
+      const score = computeScore();
+      const payload = {
+        vehicle: document.querySelector('#vehicle-menu').value,
+        features: {
+          fit_statement: 'Supported vehicle fit statement',
+          feature_list: [
+            'Optimized part throttle drive and sport maps',
+            'Optimized wide open throttle drive and sport maps',
+            'Increased clutch pressure',
+            'Increased clutch torque limits',
+            'Manual downshift lockout limit increased',
+            'Improved paddle response',
+            'Improved shift times and advanced AMAX mode',
+            'Increased maximum RPM',
+            'Reduced pull-away delay',
+            'Customizable auto up-shift behavior',
+            'Customizable launch control',
+            'Improved launch control response',
+            'Launch control enabled with stability control',
+            'Launch counter',
+            'Gear display active in drive and sport',
+            'Direct Port Programming â€“ easy install through the OBD II port without removing the ECU',
+            'Free updates included for the supported lifecycle',
+            '30-day satisfaction guarantee'
+          ]
+        },
+        gearbox: 'VW Group DSG/S tronic family',
+        mechatronic: '0BH 927 711 X',
+        clutch_architecture: {
+          K1: ['1st gear', '3rd gear', '5th gear', '7th gear'],
+          K2: ['2nd gear', '4th gear', '6th gear', 'Reverse']
+        },
+        uds_profile: {
+          config: 'configs/dq500_readonly.yaml',
+          tx_id: '0x7E1',
+          rx_id: '0x7E9',
+          bitrate: 500000,
+          session_request: '02 10 03 00 00 00 00 00',
+          success_response: '02 50 03',
+          dids: [
+            { did: '0x1901', signal: 'k1_clutch_pressure_candidate', request: '03 22 19 01 00 00 00 00' },
+            { did: '0x1902', signal: 'k2_clutch_pressure_candidate', request: '03 22 19 02 00 00 00 00' },
+            { did: '0x1905', signal: 'gearbox_oil_pressure_or_temp_candidate', request: '03 22 19 05 00 00 00 00' }
+          ]
+        },
+        mode: 'offline-review-only',
+        safety_boundary: 'read-only diagnostics; SecurityAccess and write/flash services blocked',
+        controls: values(),
+        score
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'vw-tcu-review-pack.json';
+      link.click();
+      URL.revokeObjectURL(url);
+    }
+
+    document.querySelector('#export').addEventListener('click', exportReviewPack);
+    document.querySelector('#export-page-button').addEventListener('click', exportReviewPack);
+
+    renderCalibrationGroup();
+    update();
+  </script>
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+

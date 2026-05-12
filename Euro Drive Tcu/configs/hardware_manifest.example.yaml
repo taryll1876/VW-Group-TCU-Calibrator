@@ -1,0 +1,41 @@
+shop:
+  name: "Stav Built"
+  technician: "VW specialist tuner"
+
+computer:
+  os: "Windows"
+  python: "3.10+"
+  ide: "VS Code"
+
+interfaces:
+  primary_can:
+    type: "CAN/CAN FD USB"
+    vendor: "TBD"
+    channel: "PCAN_USBBUS1"
+    bitrate: 500000
+  programming:
+    type: "SAE J2534 pass-thru"
+    vendor: "TBD"
+    authorized_workflow_only: true
+
+power:
+  bench_supply:
+    voltage: "12-14.5 V"
+    current_limit: "30-60 A"
+  battery_support_unit_required: true
+  emergency_stop_required: true
+
+harnesses:
+  - family: "DQ250"
+    status: "planned"
+  - family: "DQ381"
+    status: "planned"
+  - family: "DQ500"
+    status: "planned"
+  - family: "DL501"
+    status: "planned"
+
+safety:
+  live_flashing_enabled: false
+  security_access_enabled: false
+  read_only_diagnostics_enabled: true

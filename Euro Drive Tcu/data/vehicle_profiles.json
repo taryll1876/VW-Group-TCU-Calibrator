@@ -1,0 +1,43 @@
+﻿{
+  "schema_version": "1.0",
+  "purpose": "Text-editable vehicle support profiles. Add cars by adding JSON objects, not by rewriting code.",
+  "project_mode_default": "read_only",
+  "vehicles": [
+    {
+      "id": "audi_rs3_8y_dq500",
+      "make": "Audi",
+      "model": "RS3",
+      "generation": "8Y",
+      "gearbox_family": "DQ500",
+      "mechatronic": "0BH 927 711 X",
+      "request_id": "0x7E1",
+      "response_id": "0x7E9",
+      "signal_map": "data/dq500_map.json",
+      "torque_splitter_map": "data/torque_splitter_map.json"
+    },
+    {
+      "id": "vw_golf_r_8_dq381",
+      "make": "Volkswagen",
+      "model": "Golf R",
+      "generation": "Mk8",
+      "gearbox_family": "DQ381",
+      "mechatronic": "TBD from scan",
+      "request_id": "TBD",
+      "response_id": "TBD",
+      "signal_map": "TBD",
+      "notes": "Contributor should add validated read-only DIDs from logs."
+    },
+    {
+      "id": "audi_s3_8y_dq381",
+      "make": "Audi",
+      "model": "S3",
+      "generation": "8Y",
+      "gearbox_family": "DQ381",
+      "mechatronic": "TBD from scan",
+      "request_id": "TBD",
+      "response_id": "TBD",
+      "signal_map": "TBD",
+      "notes": "Use this profile as a text-only starting point for contributor validation."
+    }
+  ]
+}

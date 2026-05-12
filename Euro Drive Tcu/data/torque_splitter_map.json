@@ -1,0 +1,36 @@
+﻿{
+  "schema_version": "1.0",
+  "vehicle": "Audi RS3 8Y",
+  "system": "RS Torque Splitter / rear axle torque vectoring",
+  "research_status": "public architecture documented; validated CAN IDs not public in cited sources",
+  "public_architecture": {
+    "rear_clutches": ["left rear multi-disc clutch", "right rear multi-disc clutch"],
+    "inputs": ["wheel speeds", "longitudinal acceleration", "lateral acceleration", "steering angle", "gas pedal", "selected gear", "yaw angle", "drive select mode"],
+    "modes": ["Comfort/Efficiency", "Auto", "Dynamic", "RS Performance", "RS Torque Rear"],
+    "max_reported_rear_wheel_torque_nm": 1750
+  },
+  "candidate_signals": [
+    {
+      "signal": "torque_splitter_left_clutch_torque_nm",
+      "can_id": "TBD_FROM_LOGS",
+      "did": "TBD_FROM_AUTHORIZED_DIAGNOSTICS",
+      "status": "needs contributor validation"
+    },
+    {
+      "signal": "torque_splitter_right_clutch_torque_nm",
+      "can_id": "TBD_FROM_LOGS",
+      "did": "TBD_FROM_AUTHORIZED_DIAGNOSTICS",
+      "status": "needs contributor validation"
+    },
+    {
+      "signal": "torque_splitter_mode",
+      "can_id": "TBD_FROM_LOGS",
+      "did": "TBD_FROM_AUTHORIZED_DIAGNOSTICS",
+      "status": "needs contributor validation"
+    }
+  ],
+  "sources": [
+    "https://www.audi-technology-portal.de/en/drivetrain/quattro_en/audi-rs-3-torque-splitter-en",
+    "https://www.audi-mediacenter.com/en/press-releases/a-matter-of-lateral-the-torque-splitter-in-the-new-audi-rs-3-14067"
+  ]
+}

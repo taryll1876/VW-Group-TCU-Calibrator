@@ -1,0 +1,50 @@
+name: "DQ500 read-only diagnostic profile"
+mechatronic: "0BH 927 711 X"
+gearbox_family: "DQ500 7-speed DSG"
+
+clutch_architecture:
+  K1:
+    - "1st gear"
+    - "3rd gear"
+    - "5th gear"
+    - "7th gear"
+  K2:
+    - "2nd gear"
+    - "4th gear"
+    - "6th gear"
+    - "Reverse"
+
+solenoids:
+  - "N472"
+  - "N436"
+  - "N440"
+  - "N471"
+
+bus:
+  bustype: "pcan"
+  channel: "PCAN_USBBUS1"
+  bitrate: 500000
+  tx_id: "0x7e1"
+  rx_id: "0x7e9"
+  timeout_seconds: 1.0
+  interval_seconds: 0.35
+
+dids:
+  - name: "k1_clutch_pressure_candidate"
+    did: "0x1901"
+    unit: "bar"
+    scale: 0.1
+    offset: 0.0
+    description: "Candidate K1 clutch pressure actual. Validate against exact TCU software."
+  - name: "k2_clutch_pressure_candidate"
+    did: "0x1902"
+    unit: "bar"
+    scale: 0.1
+    offset: 0.0
+    description: "Candidate K2 clutch pressure actual. Validate against exact TCU software."
+  - name: "gearbox_oil_pressure_or_temp_candidate"
+    did: "0x1905"
+    unit: "raw"
+    scale: 1.0
+    offset: 0.0
+    description: "Candidate gearbox oil pressure or temperature channel. Validate before use."

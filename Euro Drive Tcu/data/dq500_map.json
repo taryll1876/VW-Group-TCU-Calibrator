@@ -1,0 +1,45 @@
+﻿{
+  "family": "DQ500",
+  "mechatronic": "0BH 927 711 X",
+  "project_mode": "read_only",
+  "notes": "Community map for read-only prototyping. No proprietary secret addresses, seed-key data, or protected unlock routines are included.",
+  "mappings": [
+    {
+      "signal": "k1_clutch_pressure_candidate_bar",
+      "did": "0x1901",
+      "service": "0x22",
+      "request": "03 22 19 01 00 00 00 00",
+      "scale": 0.1,
+      "offset": 0.0,
+      "status": "candidate_validate_per_software_version"
+    },
+    {
+      "signal": "k2_clutch_pressure_candidate_bar",
+      "did": "0x1902",
+      "service": "0x22",
+      "request": "03 22 19 02 00 00 00 00",
+      "scale": 0.1,
+      "offset": 0.0,
+      "status": "candidate_validate_per_software_version"
+    },
+    {
+      "signal": "oil_pressure_bar",
+      "did": "0x2213",
+      "service": "0x22",
+      "request": "03 22 22 13 00 00 00 00",
+      "scale": 0.001,
+      "offset": 0.0,
+      "status": "open_map_placeholder_not_secret"
+    },
+    {
+      "signal": "oil_temp_c",
+      "did": "0x1905",
+      "service": "0x22",
+      "request": "03 22 19 05 00 00 00 00",
+      "scale": 1.0,
+      "offset": -40.0,
+      "hot_threshold_c": 130.0,
+      "status": "candidate_validate_per_software_version"
+    }
+  ]
+}

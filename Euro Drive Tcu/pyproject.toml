@@ -1,0 +1,41 @@
+﻿[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vw-tcu-calibrator"
+version = "0.1.0"
+description = "Read-only VW Group DSG/S tronic TCU diagnostics and calibration review workstation."
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [
+  { name = "Stav Built / VW Specialist TCU Lab" }
+]
+dependencies = [
+  "python-can>=4.3.1",
+  "PyYAML>=6.0.1",
+  "pyserial>=3.5"
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0.0",
+  "ruff>=0.5.0",
+  "mypy>=1.8.0"
+]
+
+[project.scripts]
+vw-tcu-probe = "vw_tcu_calibrator.cli:main"
+vw-tcu-toolkit = "vw_tcu_calibrator.toolkit_cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
