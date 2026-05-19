@@ -1,0 +1,34 @@
+## 🎨 UI Assets & Dashboard Warning Lights (Audi Theme)
+
+The project includes a suite of minimalist, high-fidelity vector icons designed to replicate the Audi Virtual Cockpit aesthetic. These assets are built entirely in **Scalable Vector Graphics (SVG)** format, allowing them to remain perfectly sharp across all screen resolutions and dynamically change colors based on real-time TCU/ECU data streams.
+
+### 📂 Directory Structure
+
+Ensure the assets are organized as follows within your project workspace:
+
+```text
+VW-Group-TCU-Calibrator/
+├── Euro Drive Tcu/
+│   ├── assets/
+│   │   ├── images/
+│   │   │   ├── warning_lights/
+│   │   │   │   ├── check_engine.svg
+│   │   │   │   ├── oil_level_low.svg
+│   │   │   │   ├── central_warning.svg
+│   │   │   │   ├── brake_malfunction.svg
+│   │   │   │   ├── brake_wear.svg
+│   │   │   │   ├── airbag_fault.svg
+│   │   │   │   ├── tpms_tire_pressure.svg
+│   │   │   │   ├── rain_sensor.svg
+│   │   │   │   ├── eco_mode.svg
+│   │   │   │   ├── high_beam.svg
+│   │   │   │   ├── low_beam.svg
+│   │   │   │   ├── door_open.svg
+│   │   │   │   └── trunk_open.svg
+
+/* Color Palette Mapping for Euro Drive TCU Dashboard */
+.status-critical { color: #FF3B30; filter: drop-shadow(0 0 4px #FF3B30); } /* Red warnings */
+.status-action   { color: #FFCC00; filter: drop-shadow(0 0 4px #FFCC00); } /* Yellow / Amber engine faults */
+.status-ok       { color: #34C759; }                                       /* Green ECO / Low beams */
+.status-system   { color: #007AFF; }                                       /* Blue High Beams */
+.status-dimmed   { color: #424244; opacity: 0.3; }                         /* Inactive background states */
