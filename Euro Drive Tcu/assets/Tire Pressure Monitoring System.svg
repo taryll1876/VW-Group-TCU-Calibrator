@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Tire cross-section outline with treading at bottom -->
+  <path d="M16 16 C16 8, 48 8, 48 16 C48 36, 44 48, 38 48 L26 48 C20 48, 16 36, 16 16 Z" />
+  <!-- Treads at the bottom -->
+  <path d="M22 52 h4 M30 52 h4 M38 52 h4" stroke-width="4" />
+  <!-- Exclamation sign inside -->
+  <line x1="32" y1="20" x2="32" y2="34" stroke-width="4" />
+  <circle cx="32" cy="40" r="2" fill="currentColor" />
+</svg>
