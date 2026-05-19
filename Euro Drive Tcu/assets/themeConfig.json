@@ -1,0 +1,139 @@
+{
+  "$schema": "https://json.schemastore.org/chrome-manifest",
+  "project": "VW-Group-TCU-Calibrator",
+  "module": "Euro Drive TCU UI Engine",
+  "activeTheme": "audi_sport_virtual",
+  "themes": {
+    "audi_sport_virtual": {
+      "displayName": "Audi Sport Virtual Cockpit",
+      "globalBackground": "#0c0c0e",
+      "fontFamily": "Audi Type, Segoe UI, sans-serif",
+      "uiBorders": "1px solid #1c1c1e",
+      "states": {
+        "dimmed": {
+          "hex": "#2c2c2e",
+          "alpha": "0.25",
+          "glow": "0px 0px 0px transparent",
+          "animation": "none"
+        },
+        "ok": {
+          "hex": "#30d158",
+          "alpha": "1.0",
+          "glow": "0px 0px 8px rgba(48, 209, 88, 0.4)",
+          "animation": "none"
+        },
+        "info": {
+          "hex": "#0a84ff",
+          "alpha": "1.0",
+          "glow": "0px 0px 8px rgba(10, 132, 255, 0.4)",
+          "animation": "none"
+        },
+        "warning": {
+          "hex": "#ffd60a",
+          "alpha": "1.0",
+          "glow": "0px 0px 12px rgba(255, 214, 10, 0.5)",
+          "animation": "none"
+        },
+        "critical": {
+          "hex": "#ff453a",
+          "alpha": "1.0",
+          "glow": "0px 0px 16px rgba(255, 69, 58, 0.7)",
+          "animation": "pulse_fast"
+        }
+      }
+    },
+    "vw_r_performance": {
+      "displayName": "Volkswagen R Performance",
+      "globalBackground": "#050b14",
+      "fontFamily": "VW Head, Arial, sans-serif",
+      "uiBorders": "1px solid #14223b",
+      "states": {
+        "dimmed": {
+          "hex": "#1a2536",
+          "alpha": "0.30",
+          "glow": "0px 0px 0px transparent",
+          "animation": "none"
+        },
+        "ok": {
+          "hex": "#00f0ff",
+          "alpha": "1.0",
+          "glow": "0px 0px 10px rgba(0, 240, 255, 0.5)",
+          "animation": "none"
+        },
+        "info": {
+          "hex": "#0055ff",
+          "alpha": "1.0",
+          "glow": "0px 0px 8px rgba(0, 85, 255, 0.5)",
+          "animation": "none"
+        },
+        "warning": {
+          "hex": "ffaa00",
+          "alpha": "1.0",
+          "glow": "0px 0px 10px rgba(255, 170, 0, 0.4)",
+          "animation": "none"
+        },
+        "critical": {
+          "hex": "#ff0044",
+          "alpha": "1.0",
+          "glow": "0px 0px 14px rgba(255, 0, 68, 0.6)",
+          "animation": "strobe"
+        }
+      }
+    },
+    "porsche_motorsport": {
+      "displayName": "Porsche Weissach Motorsport",
+      "globalBackground": "#000000",
+      "fontFamily": "Porsche Next, Helvetica, sans-serif",
+      "uiBorders": "1px solid #222222",
+      "states": {
+        "dimmed": {
+          "hex": "#1c1c1c",
+          "alpha": "0.40",
+          "glow": "0px 0px 0px transparent",
+          "animation": "none"
+        },
+        "ok": {
+          "hex": "#ffffff",
+          "alpha": "1.0",
+          "glow": "0px 0px 4px rgba(255, 255, 255, 0.2)",
+          "animation": "none"
+        },
+        "info": {
+          "hex": "#00ffaa",
+          "alpha": "1.0",
+          "glow": "0px 0px 10px rgba(0, 255, 170, 0.4)",
+          "animation": "none"
+        },
+        "warning": {
+          "hex": "#ff6600",
+          "alpha": "1.0",
+          "glow": "0px 0px 12px rgba(255, 102, 0, 0.5)",
+          "animation": "none"
+        },
+        "critical": {
+          "hex": "#e60000",
+          "alpha": "1.0",
+          "glow": "0px 0px 20px rgba(230, 0, 0, 0.8)",
+          "animation": "solid_flash"
+        }
+      }
+    }
+  },
+  "animations": {
+    "pulse_fast": {
+      "keyframes": "0% { opacity: 1.0; } 100% { opacity: 0.4; }",
+      "duration": "0.6s",
+      "iteration": "infinite"
+    },
+    "strobe": {
+      "keyframes": "0% { opacity: 1.0; filter: brightness(1); } 50% { opacity: 0.1; filter: brightness(0.2); } 100% { opacity: 1.0; filter: brightness(1); }",
+      "duration": "0.3s",
+      "iteration": "infinite"
+    },
+    "solid_flash": {
+      "keyframes": "0%, 49% { visibility: visible; } 50%, 100% { visibility: hidden; }",
+      "duration": "0.5s",
+      "iteration": "infinite"
+    }
+  }
+}
