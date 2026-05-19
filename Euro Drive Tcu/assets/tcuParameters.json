@@ -1,0 +1,46 @@
+{
+  "platform": "VAG-TCU-Flash-Specs",
+  "version": "1.4.2",
+  "parameters": {
+    "clutch_pressure": {
+      "name": "Maximum Clutch Oil Pressure",
+      "address": "0x4A1F0",
+      "unit": "Bar",
+      "minLimit": 12.0,
+      "maxLimit": 19.5,
+      "defaultValue": 14.5,
+      "step": 0.1,
+      "category": "Hydraulics"
+    },
+    "launch_control_rpm": {
+      "name": "Launch Control Target RPM",
+      "address": "0x5C22A",
+      "unit": "RPM",
+      "minLimit": 2500,
+      "maxLimit": 5500,
+      "defaultValue": 3800,
+      "step": 50,
+      "category": "Launch Profile"
+    },
+    "shift_speed_ms": {
+      "name": "Shift Transition Delay (Upshift)",
+      "address": "0x3D114",
+      "unit": "ms",
+      "minLimit": 40,
+      "maxLimit": 180,
+      "defaultValue": 110,
+      "step": 5,
+      "category": "Shift Logic"
+    },
+    "torque_limit_max": {
+      "name": "TCU Maximum Input Torque Cap",
+      "address": "0x6E002",
+      "unit": "Nm",
+      "minLimit": 350,
+      "maxLimit": 750,
+      "defaultValue": 450,
+      "step": 10,
+      "category": "Torque Limits"
+    }
+  }
+}
