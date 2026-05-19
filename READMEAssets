@@ -30,5 +30,73 @@ VW-Group-TCU-Calibrator/
 .status-critical { color: #FF3B30; filter: drop-shadow(0 0 4px #FF3B30); } /* Red warnings */
 .status-action   { color: #FFCC00; filter: drop-shadow(0 0 4px #FFCC00); } /* Yellow / Amber engine faults */
 .status-ok       { color: #34C759; }                                       /* Green ECO / Low beams */
+
+/* Inactive state background element styling */
+.tcu-icon-dimmed {
+    color: #2c2c2e;
+    opacity: 0.3;
+    filter: drop-shadow(0 0 0px transparent);
+    transition: all 0.3s ease;
+}
+
+/* OK / Active operational state (Green) */
+.tcu-icon-ok {
+    color: #30d158;
+    filter: drop-shadow(0 0 8px rgba(48, 209, 88, 0.4));
+}
+
+/* System notice / High beams (Blue) */
+.tcu-icon-info {
+    color: #0a84ff;
+    filter: drop-shadow(0 0 8px rgba(10, 132, 255, 0.4));
+}
+
+/* Non-critical Faults / Check Engine / TPMS (Amber/Yellow) */
+.tcu-icon-warning {
+    color: #ffd60a;
+    filter: drop-shadow(0 0 10px rgba(255, 214, 10, 0.5));
+}
+
+/* Critical Hardware Failure / Stop Engine / Low Oil Pressure (Red) */
+.tcu-icon-critical {
+    color: #ff453a;
+    filter: drop-shadow(0 0 12px rgba(255, 69, 58, 0.6));
+    animation: tcu-pulse 1s infinite alternate;
+}
+
+@keyframes tcu-pulse {
+    0% { filter: drop-shadow(0 0 4px rgba(255, 69, 58, 0.4)); }
+    100% { filter: drop-shadow(0 0 16px rgba(255, 69, 58, 0.8)); }
+}
 .status-system   { color: #007AFF; }                                       /* Blue High Beams */
 .status-dimmed   { color: #424244; opacity: 0.3; }                         /* Inactive background states */
+
+// Example telemetry response mapping function
+function updateDashboardWidgets(telemetryData) {
+    const checkEngineIcon = document.getElementById('mil-indicator');
+    const oilPressureIcon = document.getElementById('oil-indicator');
+
+    // Handle Engine Fault State
+    if (telemetryData.milActive) {
+        checkEngineIcon.className = "tcu-icon-warning"; // Amber warning
+    } else {
+        checkEngineIcon.className = "tcu-icon-dimmed";  // Dimmed / Off
+    }
+
+    // Handle Critical Oil Pressure State
+    if (telemetryData.oilPressure < 1.2) { // Bar thresholds
+        oilPressureIcon.className = "tcu-icon-critical"; // Pulsing Red
+    } else {
+        oilPressureIcon.className = "tcu-icon-dimmed";
+    }
+}
+
+<!-- Example: Check Engine Icon Embedded Component -->
+<div class="icon-wrapper">
+  <svg id="mil-indicator" class="tcu-icon-dimmed" xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" viewBox="0 0 64 64" width="64" height="64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 24 h8 v-6 h12 v6 h16 v6 l6 6 v14 h-8 v4 h-16 v-4 h-18 v-10 h-6 v-6 h6 z" />
+    <path d="M26 18 v-4 h4 v4" />
+    <circle cx="50" cy="38" r="3" />
+    <path d="M28 30 l-4 6 h6 l-4 8" stroke-width="2" fill="currentColor" />
+  </svg>
+</div>
