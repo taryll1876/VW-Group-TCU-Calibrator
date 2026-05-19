@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Euro Drive TCU - Asset Calibration Test Bench</title>
+    <style>
+        :root {
+            --bg-color: #0c0c0e;
+            --panel-bg: #141417;
+            --border-color: #222226;
+            --text-main: #ffffff;
+            --text-muted: #8e8e93;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            margin: 0;
+            padding: 24px;
+            transition: background 0.3s ease;
+        }
+
+        header {
+            margin-bottom: 32px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 16px;
+        }
+
+        h1 { margin: 0 0 8px 0; font-size: 24px; letter-spacing: -0.5px; }
+        p { margin: 0; color: var(--text-muted); font-size: 14px; }
+
+        .control-panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 32px;
+            display: flex;
+            gap: 24px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .control-group { display: flex; flex-direction: column; gap: 6px; }
+        .control-group label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); }
+        
+        select, button {
+            background: #2c2c2e;
+            color: #fff;
+            border: 1px solid #3a3a3c;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        select:hover, button:hover { background: #3a3a3c; }
+
+        .bench-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 16px;
+        }
+
+        .icon-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            text-align: center;
+        }
+
+        .icon-card span { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+        
+        .icon-svg-container {
+            width: 64px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Direct fallback styles if theme config manager isn't running actively */
+        svg {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Euro Drive TCU Calibration Test Bench</h1>
+        <p>Telemetry Simulation Framework & Asset Verification Matrix</p>
+    </header>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label>Active Instrument Profile</label>
+            <select id="themeSelector">
+                <option value="audi_sport_virtual">Audi Sport Virtual Cockpit</option>
+                <option value="vw_r_performance">Volkswagen R Performance</option>
+                <option value="porsche_motorsport">Porsche Weissach Motorsport</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <label>Global Fault Simulation</label>
+            <div style="display: flex; gap: 8px;">
+                <button onclick="simulateAll('dimmed')">All Clear (Off)</button>
+                <button onclick="simulateAll('ok')" style="border-color: #30d158;">All OK (Green)</button>
+                <button onclick="simulateAll('warning')" style="border-color: #ffd60a;">All Warnings (Amber)</button>
+                <button onclick="simulateAll('critical')" style="border-color: #ff453a;">All Faults (Flash Red)</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="bench-grid">
+        <!-- Check Engine -->
+        <div class="icon-card">
+            <div class="icon-svg-container">
+                <svg id="chk-engine" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 24 h8 v-6 h12 v6 h16 v6 l6 6 v14 h-8 v4 h-16 v-4 h-18 v-10 h-6 v-6 h6 z" />
+                    <path d="M26 18 v-4 h4 v4" />
+                    <circle cx="50" cy="38" r="3" />
+                    <path d="M28 30 l-4 6 h6 l-4 8" stroke-width="2" fill="currentColor" />
+                </svg>
+            </div>
+            <span>Check Engine</span>
+        </div>
+
+        <!-- Oil Level -->
+        <div class="icon-card">
+            <div class="icon-svg-container">
+                <svg id="oil-level" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M10 45 c0-8 6-10 14-10 h24 v15 c0 4-3 7-7 7 h-24 c-4 0-7-3-7-7 z" />
+                    <path d="M48 35 v-6 c0-3-2-5-5-5 h-5" />
+                    <path d="M24 35 l-12-8 c-2-1-4-1-5 1 l-3 4" />
+                    <path d="M3 24 c0 0 2-3 2-5 s-2-3-2-3 s-2 1-2 3 s2 5 2 5 z" fill="currentColor" stroke="none" />
+                    <path d="M16 42 q 4-2, 8 0 t 8 0 t 8 0" stroke-width="2" />
+                </svg>
+            </div>
+            <span>Oil Pressure</span>
+        </div>
+
+        <!-- Master Warning -->
+        <div class="icon-card">
+            <div class="icon-svg-container">
+                <svg id="master-warn" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round">
+                    <path d="M32 6 L58 54 C60 58, 57 60, 53 60 L11 60 C7 60, 4 58, 6 54 Z" stroke-linecap="round" />
+                    <line x1="32" y1="22" x2="32" y2="40" stroke-linecap="round" stroke-width="4" />
+                    <circle cx="32" cy="49" r="2.5" fill="currentColor" />
+                </svg>
+            </div>
+            <span>Master Alert</span>
+        </div>
+
+        <!-- Brake Fault -->
+        <div class="icon-card">
+            <div class="icon-svg-container">
+                <svg id="brake-fault" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="32" cy="32" r="16" />
+                    <path d="M10 20 A 22 22 0 0 0 10 44" />
+                    <path d="M54 20 A 22 22 0 0 1 54 44" />
+                    <line x1="32" y1="24" x2="32" y2="38" stroke-width="4" />
+                    <circle cx="32" cy="45" r="2" fill="currentColor" />
+                </svg>
+            </div>
+            <span>Brake Warning</span>
+        </div>
+
+        <!-- Brake Lining -->
+        <div class="icon-card">
+            <div class="icon-svg-container">
+                <svg id="brake-wear" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="32" cy="32" r="16" />
+                    <path d="M10 20 M 10 24 A 22 22 0 0 0 12 32 M 12 36 A 22 22 0 0 0 10 40" />
+                    <path d="M54 20 M 54 24 A 22 22 0 0 1 52 32 M 52 36 A 22 22 0 0 1 54 40" />
+                </svg>
+            </div>
+            <span>Brake Wear Sensor</span>
+        </div>
+
+        <!-- Airbag -->
+        <div class="icon-card">
+            <div class="icon-svg-container">
+                <svg id="airbag-fault" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="36" cy="18" r="5" />
+                    <path d="M42 28 c-4-3-8-2-12 2 l-8 10 v14" />
+                    <path d="M34 32 l-4 10 h12 v12" />
+                    <circle cx="20" cy="24" r="9" stroke-dasharray="3 2" />
+                </svg>
+            </div>
+            <span>Airbag Active</span>
+        </div>
+
+        <!-- TPMS -->
+        <div class="icon-card">
+            <div class="icon-svg-container">
+                <svg id="tpms-fault" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M16 16 C16 8, 48 8, 48 16 C48 36, 44 48, 38 48 L26 48 C20 48, 16 36, 16 16 Z" />
+                    <path d="M22 52 h4 M30 52 h4 M38 52 h4" stroke-width="4" />
+                    <line x1="32" y1="20" x2="32" y2="34" stroke-width="4" />
+                    <circle cx="32" cy="40" r="2" fill="currentColor" />
+                </svg>
+            </div>
+            <span>TPMS System</span>
+        </div>
+
+        <!-- Rain Sensor -->
+        <div class="icon-card">
+            <div class="icon-svg-container">
+                <svg id="rain-sensor" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="10" y1="50" x2="54" y2="18" stroke-width="4" />
+                    <line x1="24" y1="40" x2="44" y2="12" />
+                    <path d="M18 14 v4 M32 8 v4 M48 6 v4" stroke-dasharray="2 2" />
+                </svg>
+            </div>
+            <span>Rain Sensor</span>
+        </div>
+
+        <!-- ECO Indicator -->
+        <div class="icon-card">
+            <div class="icon-svg-container">
+                <svg id="eco-mode" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M46 16 H22 v32 h26 M22 32 h20" />
+                    <path d="M52 24 A 24 24 0 1 0 44 48" stroke-dasharray="4 2" />
+                </svg>
+            </div>
+            <span>ECO Matrix</span>
+        </div>
+
+        <!-- High Beam -->
+        <div class="icon-card">
+            <div class="icon-svg-container">
+                <svg id="beam-high" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M34 16 C22 16, 16 24, 16 32 C16 40, 22 48, 34 48 Z" fill="currentColor" fill-opacity="0.1"/>
+                    <line x1="34" y1="16" x2="34" y2="48" />
+                    <line x1="44" y1="20" x2="58" y2="20" stroke-width="4" />
+                    <line x1="48" y1="32" x2="62" y2="32" stroke-width="4" />
+                    <line x1="44" y1="44" x2="58" y2="44" stroke-width="4" />
+                </svg>
+            </div>
+            <span>High Beam</span>
+        </div>
+
+        <!-- Low Beam -->
+        <div class="icon-card">
+            <div class="icon-svg-container">
+                <svg id="beam-low" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M34 16 C22 16, 16 24, 16 32 C16 40, 22 48, 34 48 Z" />
+                    <line x1="34" y1="16" x2="34" y2="48" />
+                    <line x1="44" y1="16" x2="56" y2="26" />
+                    <line x1="46" y1="27" x2="58" y2="37" />
+                    <line x1="44" y1="38" x2="56" y2="48" />
+                </svg>
+            </div>
+            <span>Low Beam</span>
+        </div>
+
+        <!-- Door Open -->
+        <div class="icon-card">
+            <div class="icon-svg-container">
+                <svg id="door-open" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 14 C22 10, 42 10, 42 14 V54 C42 58, 22 58, 22 54 Z" />
+                    <path d="M22 24 L10 20 v6" stroke-width="4" />
+                    <path d="M42 24 L54 20 v6" stroke-width="4" />
+                </svg>
+            </div>
+            <span>Door Warning</span>
+        </div>
+
+        <!-- Trunk Open -->
+        <div class="icon-card">
+            <div class="icon-svg-container">
+                <svg id="trunk-open" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 50 h40 v-8 l-6-18 h-28 l-6 18 z" />
+                    <path d="M20 24 l12-14 l12 14" stroke-width="4" />
+                    <line x1="32" y1="10" x2="32" y2="24" stroke-dasharray="2 2" />
+                </svg>
+            </div>
+            <span>Trunk Open</span>
+        </div>
+    </div>
+
+    <!-- Hook directly into our asset backend manager engine modules -->
+    <script type="module">
+        import DashboardManager from '../js/dashboardManager.js';
+
+        const engine = new DashboardManager('../assets/themeConfig.json');
+        
+        async function initBench() {
+            await engine.initialize();
+            
+            // Map the DOM IDs to simulated metrics channels
+            engine.registerIndicator('chk-engine', 'mil');
+            engine.registerIndicator('oil-level', 'oil');
+            engine.registerIndicator('master-warn', 'master');
+            engine.registerIndicator('brake-fault', 'brake');
+            engine.registerIndicator('brake-wear', 'wear');
+            engine.registerIndicator('airbag-fault', 'airbag');
+            engine.registerIndicator('tpms-fault', 'tpms');
+            engine.registerIndicator('rain-sensor', 'rain');
+            engine.registerIndicator('eco-mode', 'eco');
+            engine.registerIndicator('beam-high', 'high');
+            engine.registerIndicator('beam-low', 'low');
+            engine.registerIndicator('door-open', 'door');
+            engine.registerIndicator('trunk-open', 'trunk');
+
+            // Listen for brand selector switches
+            document.getElementById('themeSelector').addEventListener('change', (e) => {
+                engine.setTheme(e.target.value);
+            });
+        }
+
+        // Global simulation controller exposed directly to button elements
+        window.simulateAll = function(stateValue) {
+            const mockPacket = {
+                mil: stateValue, oil: stateValue, master: stateValue,
+                brake: stateValue, wear: stateValue, airbag: stateValue,
+                tpms: stateValue, rain: stateValue, eco: stateValue,
+                high: stateValue, low: stateValue, door: stateValue, trunk: stateValue
+            };
+            engine.parseTelemetry(mockPacket);
+        };
+
+        window.addEventListener('DOMContentLoaded', initBench);
+    </script>
+</body>
+</html>
