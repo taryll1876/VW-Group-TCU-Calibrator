@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Euro Drive TCU - Audi Sport Cockpit Monitor</title>
+    <style>
+        :root {
+            --audi-black-core: #09090b;
+            --audi-black-card: #111114;
+            --audi-red-sport: #ff1e27;
+            --text-pure: #ffffff;
+            --text-dimmed: #4a4a52;
+            --stroke-border: #1f1f24;
+        }
+
+        body {
+            background-color: var(--audi-black-core);
+            color: var(--text-pure);
+            font-family: 'Segoe UI', -apple-system, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .cockpit-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        nav.top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--audi-red-sport);
+            padding-bottom: 12px;
+            margin-bottom: 24px;
+        }
+
+        .brand-badge {
+            font-weight: 800;
+            letter-spacing: 1px;
+            font-size: 18px;
+        }
+        .brand-badge span { color: var(--audi-red-sport); }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+
+        .panel-card {
+            background: var(--audi-black-card);
+            border: 1px solid var(--stroke-border);
+            border-radius: 6px;
+            padding: 24px;
+        }
+
+        /* Responsive Tuning Control Drivers */
+        .tuner-bench { display: flex; flex-direction: column; gap: 20px; }
+        .slider-group { display: flex; flex-direction: column; gap: 8px; }
+        .slider-group label { font-size: 11px; text-transform: uppercase; color: var(--text-dimmed); letter-spacing: 0.5px; }
+        .slider-row { display: flex; align-items: center; gap: 12px; }
+        
+        input[type="range"] {
+            flex-grow: 1;
+            accent-color: var(--audi-red-sport);
+            background: var(--stroke-border);
+            height: 6px;
+            border-radius: 3px;
+            outline: none;
+        }
+
+        .val-bubble { min-width: 50px; text-align: right; font-weight: 600; color: var(--audi-red-sport); font-family: monospace; }
+
+        /* Hockey-Stick Tachometer Implementation */
+        .bar-container {
+            background: #18181c;
+            height: 44px;
+            width: 100%;
+            border-radius: 4px;
+            border: 1px solid var(--stroke-border);
+            display: flex;
+            gap: 3px;
+            padding: 3px;
+            box-sizing: border-box;
+            margin-top: 10px;
+        }
+
+        .rpm-segment {
+            flex-grow: 1;
+            background: #232329;
+            border-radius: 1px;
+        }
+
+        /* Warning Clusters Custom Layout Grid */
+        .cluster-tray {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-top: 24px;
+            border-top: 1px solid var(--stroke-border);
+            padding-top: 24px;
+        }
+
+        .tray-icon {
+            color: #1a1a22;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+            background: #0b0b0d;
+            border-radius: 6px;
+            border: 1px solid #141417;
+        }
+
+        /* Global Status Coloring States overrides */
+        .active-red { color: var(--audi-red-sport) !important; filter: drop-shadow(0 0 8px var(--audi-red-sport)); }
+        .active-amber { color: #ffbc00 !important; filter: drop-shadow(0 0 8px #ffbc00); }
+
+        .shift-flash { animation: flash-strobe 0.15s infinite alternate; }
+        @keyframes flash-strobe {
+            0% { background-color: rgba(255, 30, 39, 0.1); }
+            100% { background-color: rgba(255, 30, 39, 0.5); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="cockpit-container">
+        <nav class="top-bar">
+            <div class="brand-badge">EURO DRIVE <span>// RS MONITOR</span></div>
+            <span id="connStatus" style="font-size:12px; color:var(--text-dimmed); font-weight:600;">LOCAL SIMULATION ACTIVE</span>
+        </nav>
+
+        <div class="dashboard-grid">
+            <!-- Left Panel: Graphic Instrument Gauges -->
+            <div class="panel-card" id="mainGaugeViewport">
+                <div style="display:flex; justify-content:space-between; align-items:flex-end;">
+                    <span style="font-size:11px; text-transform:uppercase; color:var(--text-dimmed); letter-spacing:1px;">Live Tacho Sweep</span>
+                    <span id="txtDigitalRpm" style="font-weight:800; font-size:24px; font-family:monospace;">1000 RPM</span>
+                </div>
+                
+                <div class="bar-container">
+                    <!-- 30 segments for visual tracking definition -->
+                    <div class="rpm-segment"></div><div class="rpm-segment"></div><div class="rpm-segment"></div><div class="rpm-segment"></div><div class="rpm-segment"></div><div class="rpm-segment"></div><div class="rpm-segment"></div><div class="rpm-segment"></div><div class="rpm-segment"></div><div class="rpm-segment"></div><div class="rpm-segment"></div><div class="rpm-segment"></div><div class="rpm-segment"></div><div class="rpm-segment"></div><div class="rpm-segment"></div><div class="rpm-segment"></div><div class="rpm-segment"></div><div class="rpm-segment"></div><div class="rpm-segment"></div><div class="rpm-segment"></div><div class="rpm-segment"></div><div class="rpm-segment"></div><div class="rpm-segment"></div><div class="rpm-segment"></div><div class="rpm-segment"></div><div class="rpm-segment"></div><div class="rpm-segment"></div><div class="rpm-segment"></div><div class="rpm-segment"></div><div class="rpm-segment"></div>
+                </div>
+
+                <div class="cluster-tray">
+                    <div class="tray-icon" id="svgMil"><svg width="32" height="32" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="4"><path d="M12 24 h8 v-6 h12 v6 h16 v6 l6 6 v14 h-8 v4 h-16 v-4 h-18 v-10 h-6 v-6 h6 z" /><path d="M26 18 v-4 h4 v4" /><circle cx="50" cy="38" r="1" fill="currentColor"/></svg></div>
+                    <div class="tray-icon" id="svgOil"><svg width="32" height="32" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="4"><path d="M10 45 c0-8 6-10 14-10 h24 v15 c0 4-3 7-7 7 h-24 c-4 0-7-3-7-7 z" /><path d="M48 35 v-6 c0-3-2-5-5-5 h-5" /></svg></div>
+                    <div class="tray-icon" id="svgMaster"><svg width="32" height="32" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="4"><path d="M32 6 L58 54 L11 54 Z" /><line x1="32" y1="22" x2="32" y2="38" stroke-width="5" /></svg></div>
+                    <div class="tray-icon" id="svgTpms"><svg width="32" height="32" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="4"><path d="M16 16 C16 8, 48 8, 48 16 C48 36, 44 48, 38 48 L26 48 C20 48, 16 36, 16 16 Z" /><line x1="32" y1="22" x2="32" y2="34" stroke-width="4"/></svg></div>
+                </div>
+            </div>
+
+            <!-- Right Panel: Driver Simulation Input Triggers -->
+            <div class="panel-card">
+                <div class="tuner-bench">
+                    <h3 style="margin:0; font-size:12px; color:var(--text-dimmed); text-transform:uppercase;">Manual Rig Toggles</h3>
+                    
+                    <div class="slider-group">
+                        <label>Engine Velocity</label>
+                        <div class="slider-row">
+                            <input type="range" id="driveRpm" min="1000" max="8000" value="2000">
+                            <div class="val-bubble" id="lblRpm">2000</div>
+                        </div>
+                    </div>
+
+                    <div class="slider-group">
+                        <label>Clutch Hydraulic Line</label>
+                        <div class="slider-row">
+                            <input type="range" id="drivePressure" min="10" max="22" value="13" step="1">
+                            <div class="val-bubble" id="lblPressure">13B</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        const driveRpm = document.getElementById('driveRpm');
+        const drivePressure = document.getElementById('drivePressure');
+        const txtDigitalRpm = document.getElementById('txtDigitalRpm');
+        const mainGaugeViewport = document.getElementById('mainGaugeViewport');
+        const segments = document.querySelectorAll('.rpm-segment');
+
+        // Warnings vector nodes
+        const svgMil = document.getElementById('svgMil');
+        const svgOil = document.getElementById('svgOil');
+        const svgMaster = document.getElementById('svgMaster');
+        const svgTpms = document.getElementById('svgTpms');
+
+        function drawInstruments(rpm, pressure) {
+            txtDigitalRpm.innerText = `${rpm} RPM`;
+            document.getElementById('lblRpm').innerText = rpm;
+            document.getElementById('lblPressure').innerText = `${pressure}B`;
+
+            const totalBars = segments.length;
+            const filledBars = Math.floor((rpm / 8000) * totalBars);
+
+            // Shift warning redline strobe
+            if (rpm >= 7200) mainGaugeViewport.classList.add('shift-flash');
+            else mainGaugeViewport.classList.remove('shift-flash');
+
+            segments.forEach((bar, idx) => {
+                if (idx < filledBars) {
+                    if (idx > 24) bar.style.backgroundColor = 'var(--audi-red-sport)';
+                    else if (idx > 18) bar.style.backgroundColor = '#ffbc00';
+                    else bar.style.backgroundColor = '#30d158';
+                } else {
+                    bar.style.backgroundColor = '#232329';
+                }
+            });
+
+            // Diagnostic logic mappings
+            if (rpm > 6800) svgMil.className = "tray-icon active-amber"; else svgMil.className = "tray-icon";
+            if (pressure > 18) svgOil.className = "tray-icon active-red"; else svgOil.className = "tray-icon";
+            if (pressure > 20 || rpm > 7200) svgMaster.className = "tray-icon active-red"; else svgMaster.className = "tray-icon";
+            if (pressure < 12) svgTpms.className = "tray-icon active-amber"; else svgTpms.className = "tray-icon";
+        }
+
+        // 1. Listen for manual sliders locally
+        driveRpm.addEventListener('input', () => drawInstruments(parseInt(driveRpm.value), parseInt(drivePressure.value)));
+        drivePressure.addEventListener('input', () => drawInstruments(parseInt(driveRpm.value), parseInt(drivePressure.value)));
+
+        // 2. Automate backend pipeline listener hook if Python server drops packets
+        const connectionBadge = document.getElementById('connStatus');
+        const wsBridge = new WebSocket('ws://localhost:8555/stream');
+
+        wsBridge.onopen = () => { connectionBadge.innerText = "TCU BACKEND STREAM LIVE"; connectionBadge.style.color = "#30d158"; };
+        wsBridge.onerror = () => { console.log("[WS] Server offline. Defaulting to local workspace rig controllers."); };
+        wsBridge.onmessage = (evt) => {
+            const incoming = JSON.parse(evt.data);
+            // Dynamic adjustments over-writing sliders actively
+            driveRpm.value = incoming.rpm;
+            drivePressure.value = incoming.clutch_pressure;
+            drawInstruments(incoming.rpm, incoming.clutch_pressure);
+        };
+
+        // Seed initial frame view
+        drawInstruments(2000, 13);
+    </script>
+</body>
+</html>
