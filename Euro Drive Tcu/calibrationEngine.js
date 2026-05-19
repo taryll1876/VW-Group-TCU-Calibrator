@@ -3,6 +3,11 @@
  * Manages operational parameters, threshold validation, and binary map profile exports.
  */
 class CalibrationEngine {
+    constructor(paramConfigPath = '../../../assets/tcuParameters.json') { // Adjusted backsteps
+        this.paramConfigPath = paramConfigPath;
+        // ... rest of code
+
+class CalibrationEngine {
     constructor(paramConfigPath = '../assets/tcuParameters.json') {
         this.paramConfigPath = paramConfigPath;
         this.parameterMeta = null;
