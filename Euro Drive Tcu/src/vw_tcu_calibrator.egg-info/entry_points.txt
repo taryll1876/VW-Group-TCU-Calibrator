@@ -1,0 +1,2 @@
+[console_scripts]
+vw-tcu-probe = vw_tcu_calibrator.cli:main

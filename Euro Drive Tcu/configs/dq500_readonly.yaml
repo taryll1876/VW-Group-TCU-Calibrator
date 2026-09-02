@@ -48,3 +48,27 @@ dids:
     scale: 1.0
     offset: 0.0
     description: "Candidate gearbox oil pressure or temperature channel. Validate before use."
+  - name: "oil_pump_hydraulic_pressure"
+    did: "0x1906"
+    unit: "bar"
+    scale: 0.1
+    offset: 0.0
+    description: "Oil pump hydraulic pressure sensor."
+  - name: "transmission_oil_monitor_level"
+    did: "0x1907"
+    unit: "%"
+    scale: 1.0
+    offset: 0.0
+    description: "Transmission oil level monitor."
+  - name: "drive_shaft_speed"
+    did: "0x1908"
+    unit: "rpm"
+    scale: 1.0
+    offset: 0.0
+    description: "Drive shaft rotational speed."
+  - name: "output_shaft_speed"
+    did: "0x1909"
+    unit: "rpm"
+    scale: 1.0
+    offset: 0.0
+    description: "Output shaft rotational speed."

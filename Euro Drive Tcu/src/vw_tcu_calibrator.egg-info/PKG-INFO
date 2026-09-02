@@ -1,0 +1,219 @@
+Metadata-Version: 2.4
+Name: vw-tcu-calibrator
+Version: 0.1.0
+Summary: Read-only VW Group DSG/S tronic TCU diagnostics and calibration review workstation.
+Author: Stav Built / VW Specialist TCU Lab
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+Requires-Dist: python-can>=4.3.1
+Requires-Dist: PyYAML>=6.0.1
+Requires-Dist: numpy>=1.26.0
+Provides-Extra: dev
+Requires-Dist: pytest>=8.0.0; extra == "dev"
+Requires-Dist: ruff>=0.5.0; extra == "dev"
+Requires-Dist: mypy>=1.8.0; extra == "dev"
+
+# VW Group TCU Calibrator
+
+A read-only calibration and telemetry workspace for VW/Audi DSG and S tronic TCU analysis, built around a safety-first architecture for normalized signals, replay sandboxing, and validation-controlled operation.
+
+## Purpose
+
+This repository is intended for lawful diagnostics, telemetry review, and calibration planning work. It is not a bypass tool, not a flashing tool, and not a seed-key or SecurityAccess exploit project.
+
+The goal is to provide a practical foundation for:
+
+- read-only UDS health checks
+- normalized engineering telemetry
+- replayable event streams for sandbox analysis
+- deterministic validation gates and passive fallback behavior
+- simulation/physics modeling built on gearbox-agnostic signals
+
+## Current status
+
+The project has evolved from a UI prototype into a stronger software foundation with:
+
+- a safe, read-only probe path
+- normalized signal conversion for engineering values
+- replay/event ordering support for logs and sandbox analysis
+- validation state transitions for safe fallback behavior
+- a Python package structure suitable for continued development and GitHub collaboration
+
+## Async isolation and telemetry pipeline
+
+The runtime design uses a hybrid model for scalability:
+
+- asyncio handles orchestration, queue flow, I/O, and UI-facing streaming
+- bounded queues keep the telemetry lane stable and prevent unbounded backlog growth
+- computationally expensive scoring or correlation work can be isolated to process workers rather than threads when the CPU budget grows
+
+This avoids the common pitfall of pushing heavy analysis into the event loop while still keeping the system responsive and easy to reason about.
+
+## Abuse index modeling
+
+The abuse model uses rolling windows and deques for live telemetry, with optional NumPy acceleration for vectorized moving statistics and peak detection.
+
+Score logic is intentionally bounded to 0..100 and is based on:
+
+- pressure accumulation and pressure-ramp behavior
+- thermal accumulation and thermal ramping
+- shaft-speed stress and transient spikes
+
+This keeps memory usage predictable while still supporting real-time scoring in a telemetry hot path.
+
+## Architecture
+
+The project is based on a layered model instead of direct DID-to-physics mapping:
+
+- raw DID / transport frame input
+- decoder and scaling layer
+- normalized engineering signal layer
+- physics/simulation model layer
+
+Example normalized signal set:
+
+- clutch_k1_pressure_bar
+- clutch_k2_pressure_bar
+- clutch_fill_time_ms
+- thermal_load_index
+- oil_pressure_bar
+- shaft_speed_rpm
+
+This keeps the simulation engine independent from source-specific scaling while preserving:
+
+- raw source values
+- scaling metadata
+- polling frequency and timestamps
+- confidence and validity state
+
+## Replay and sandbox model
+
+The replay system prefers a time-ordered event stream over a fixed-rate frame model.
+
+The intended flow is:
+
+1. ingest raw frames
+2. normalize timestamps
+3. merge chronologically
+4. replay through a simulation clock
+5. react to signal updates, timeouts, session changes, and handshake events
+
+This is more robust when mixing:
+
+- CAN traffic
+- CAN FD activity
+- slow UDS polling
+- operator actions
+- thermal and abuse simulations
+
+The implementation also separates transport replay from normalized-signal replay so the model can be exercised without raw CAN logs.
+
+## Validation gates
+
+Validation is modeled as a state machine rather than isolated checks.
+
+Key states include:
+
+- INIT
+- INTERFACE_VALIDATED
+- SESSION_ACTIVE
+- DEGRADED
+- PASSIVE_READONLY
+
+Critical failures such as:
+
+- low or unstable supply voltage
+- handshake timeout
+- interface disconnect
+- corrupted or unhealthy frame stream
+- invalid profile match or untrusted telemetry
+
+cause a deterministic fallback into a passive/read-only state.
+
+## Repository layout
+
+- `index.html`: browser-based UI prototype
+- `src/vw_tcu_calibrator/`: Python package for transport, simulation, validation, and telemetry
+- `tests/`: regression tests for health, UDS safety, telemetry normalization, replay ordering, and validation state behavior
+- `configs/`: target profiles and config examples
+- `data/`: sample logs and mapping artifacts
+- `docs/`: supporting design and hardware notes
+- `cpp/`: C++ transport starter code
+- `tools/`: standalone probes and utilities
+
+## Quick start
+
+Create and activate the environment:
+
+```powershell
+py -3 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt -e .
+```
+
+Run the dry-read probe:
+
+```powershell
+python -m vw_tcu_calibrator.cli --config configs/dq500_readonly.yaml --dry-run
+```
+
+Run the stream mode:
+
+```powershell
+python -m vw_tcu_calibrator.cli --config configs/dq500_readonly.yaml --stream
+```
+
+Run the simulated toolkit stream:
+
+```powershell
+python -m vw_tcu_calibrator.toolkit_cli --sim --port 8765
+```
+
+Run tests:
+
+```powershell
+python -m pytest
+```
+
+## Safety and legal boundaries
+
+This project intentionally does not implement:
+
+- seed-key unlocks
+- proprietary SecurityAccess algorithms
+- unauthorized flashing or firmware extraction
+- immobilizer bypass
+- raw memory unlock workflows
+- OEM bypass or illegal tuning procedures
+
+Allowed use is limited to lawful diagnostics, logging, telemetry review, project planning, and read-only validation workflows using approved tools and documentation.
+
+Before building any harness or using a bench setup, validate pinouts and procedures against OEM service information, licensed repair data, or supplier documentation.
+
+## C++ transport considerations
+
+A C++ layer is appropriate for high-throughput transport tasks such as:
+
+- ISO-TP buffering
+- CAN FD frame parsing
+- low-latency adapter wrappers
+- deterministic transport handling for real-time capture
+
+The higher-level validation, telemetry normalization, and simulation logic should remain separated from the transport boundary.
+
+## DQ500 notes
+
+The project continues to treat DQ500-oriented identifiers as reference labels until validated against exact vehicle, software, and gearbox-specific service data. This includes clutch pressure channels and solenoid watch lists that are used for architecture development and prototype calibration work.
+
+## References
+
+- SAE J2534 pass-through interface standard
+- CAN and CAN FD interface documentation
+- VW/Audi diagnostics and service information used under proper licensing and lawful access
+
+## License and contribution
+
+This repository is for controlled internal development and lawful vehicle-system research. Use it in accordance with local laws, OEM requirements, and your own legal/compliance obligations.
+
+Contributors should keep any changes aligned with the safe, read-only, and validation-first project direction.

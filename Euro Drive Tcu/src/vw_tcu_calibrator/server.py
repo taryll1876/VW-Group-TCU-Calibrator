@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import json
 import queue
@@ -7,7 +7,7 @@ import time
 from dataclasses import dataclass
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from typing import Any, Iterable
+from typing import Any, Iterable, Optional
 
 
 @dataclass(frozen=True)
@@ -18,22 +18,24 @@ class ToolkitSignalSnapshot:
     k2_clutch_pressure_candidate_bar: float | None
     oil_temp_c: float | None
     oil_pressure_bar: float | None = None
+    oil_pump_hydraulic_pressure_bar: float | None = None
+    transmission_oil_monitor_level_percent: float | None = None
+    drive_shaft_speed_rpm: float | None = None
+    output_shaft_speed_rpm: float | None = None
     abuse_index: float | None = None
-    rpm: float | None = None
-    throttle_pct: float | None = None
-    virtual_gear: int | None = None
 
     @staticmethod
     def from_dict(d: dict[str, Any]) -> "ToolkitSignalSnapshot":
         return ToolkitSignalSnapshot(
-            k1_clutch_pressure_candidate_bar=_maybe_float(d.get("k1_clutch_pressure_candidate_bar")),
-            k2_clutch_pressure_candidate_bar=_maybe_float(d.get("k2_clutch_pressure_candidate_bar")),
-            oil_temp_c=_maybe_float(d.get("oil_temp_c")),
+            k1_clutch_pressure_candidate_bar=_maybe_float(d.get("k1_clutch_pressure_candidate")),
+            k2_clutch_pressure_candidate_bar=_maybe_float(d.get("k2_clutch_pressure_candidate")),
+            oil_temp_c=_maybe_float(d.get("gearbox_oil_pressure_or_temp_candidate")),  # Note: this is a candidate, not direct temp
             oil_pressure_bar=_maybe_float(d.get("oil_pressure_bar")),
+            oil_pump_hydraulic_pressure_bar=_maybe_float(d.get("oil_pump_hydraulic_pressure")),
+            transmission_oil_monitor_level_percent=_maybe_float(d.get("transmission_oil_monitor_level")),
+            drive_shaft_speed_rpm=_maybe_float(d.get("drive_shaft_speed")),
+            output_shaft_speed_rpm=_maybe_float(d.get("output_shaft_speed")),
             abuse_index=_maybe_float(d.get("abuse_index")),
-            rpm=_maybe_float(d.get("rpm")),
-            throttle_pct=_maybe_float(d.get("throttle_pct")),
-            virtual_gear=_maybe_int(d.get("virtual_gear")),
         )
 
     def to_ui_payload(self) -> dict[str, Any]:
@@ -42,10 +44,12 @@ class ToolkitSignalSnapshot:
             "k2_clutch_pressure_candidate_bar": self.k2_clutch_pressure_candidate_bar,
             "oil_temp_c": self.oil_temp_c,
             "oil_pressure_bar": self.oil_pressure_bar,
+            "oil_pump_hydraulic_pressure_bar": self.oil_pump_hydraulic_pressure_bar,
+            "transmission_oil_monitor_level_percent": self.transmission_oil_monitor_level_percent,
+            "drive_shaft_speed_rpm": self.drive_shaft_speed_rpm,
+            "output_shaft_speed_rpm": self.output_shaft_speed_rpm,
+            # Keep UI-compatible derived fields; backend will send these to avoid duplicating business logic.
             "abuse_index": self.abuse_index,
-            "rpm": self.rpm,
-            "throttle_pct": self.throttle_pct,
-            "virtual_gear": self.virtual_gear,
         }
 
 
@@ -54,15 +58,6 @@ def _maybe_float(v: Any) -> float | None:
         return None
     try:
         return float(v)
-    except (TypeError, ValueError):
-        return None
-
-
-def _maybe_int(v: Any) -> int | None:
-    if v is None:
-        return None
-    try:
-        return int(v)
     except (TypeError, ValueError):
         return None
 
@@ -87,6 +82,7 @@ class _Broadcaster:
         with self._lock:
             clients = list(self._clients)
         for q in clients:
+            # drop oldest if client is slow
             if q.qsize() > 10:
                 try:
                     q.get_nowait()
@@ -101,7 +97,7 @@ class ToolkitServer:
         *,
         host: str = "127.0.0.1",
         port: int = 8765,
-        snapshot_source: Iterable[ToolkitSignalSnapshot],
+        snapshot_source: "Iterable[ToolkitSignalSnapshot]",
         tick_seconds: float = 0.25,
     ) -> None:
         self.host = host
@@ -150,6 +146,7 @@ class ToolkitServer:
 
                     q = server._broadcaster.register()
                     try:
+                        # push initial
                         while not server._stop.is_set():
                             try:
                                 payload = q.get(timeout=1.0)
@@ -165,10 +162,12 @@ class ToolkitServer:
                 self.end_headers()
 
             def log_message(self, format: str, *args: Any) -> None:  # noqa: A002
+                # quiet
                 return
 
         self._httpd = ThreadingHTTPServer((self.host, self.port), Handler)
 
+        # start broadcaster loop
         def broadcaster_loop() -> None:
             last = 0.0
             for snap in parent_snapshot_source:
@@ -186,9 +185,12 @@ class ToolkitServer:
         t.start()
 
         try:
+            # ThreadingHTTPServer in the stdlib supports serve_forever(); poll_interval
+            # is only available in some Python versions, so keep it compatible.
             self._httpd.serve_forever()
         except Exception:
             pass
+
 
 
 def run_toolkit_server(*, snapshot_source: Iterable[ToolkitSignalSnapshot], host: str, port: int) -> None:

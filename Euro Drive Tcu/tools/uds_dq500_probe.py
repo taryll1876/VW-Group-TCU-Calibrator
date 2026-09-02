@@ -33,6 +33,10 @@ DIDS = [
     DidSignal("k1_clutch_pressure_candidate", 0x1901, "bar", 0.1),
     DidSignal("k2_clutch_pressure_candidate", 0x1902, "bar", 0.1),
     DidSignal("gearbox_oil_pressure_or_temp_candidate", 0x1905, "raw", 1.0),
+    DidSignal("oil_pump_hydraulic_pressure", 0x1906, "bar", 0.1),
+    DidSignal("transmission_oil_monitor_level", 0x1907, "%", 1.0),
+    DidSignal("drive_shaft_speed", 0x1908, "rpm", 1.0),
+    DidSignal("output_shaft_speed", 0x1909, "rpm", 1.0),
 ]
 
 
@@ -83,10 +87,14 @@ class DryBus:
         if self.counter == 1:
             return DryMessage(self.rx_id, bytes.fromhex("02 50 03 00 00 00 00 00"))
         sample = [
-            bytes.fromhex("05 62 19 01 01 6D 00 00"),
-            bytes.fromhex("05 62 19 02 01 59 00 00"),
-            bytes.fromhex("05 62 19 05 00 58 00 00"),
-        ][(self.counter - 2) % 3]
+            bytes.fromhex("05 62 19 01 01 6D 00 00"),  # 36.5 bar
+            bytes.fromhex("05 62 19 02 01 59 00 00"),  # 34.5 bar
+            bytes.fromhex("05 62 19 05 00 58 00 00"),  # 88 raw
+            bytes.fromhex("05 62 19 06 01 9B 00 00"),  # 41.1 bar
+            bytes.fromhex("05 62 19 07 00 55 00 00"),  # 85 %
+            bytes.fromhex("05 62 19 08 04 B0 00 00"),  # 1200 rpm
+            bytes.fromhex("05 62 19 09 04 B0 00 00"),  # 1200 rpm
+        ][(self.counter - 2) % 7]
         return DryMessage(self.rx_id, sample)
 
     def shutdown(self) -> None:
